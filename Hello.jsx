@@ -7,7 +7,7 @@ module.exports = React.createClass({
         return (
         	<p>
         		Hello, <input type="text" placeholder="Your name here" />!
-        		It is {this.props.date.toTimeString()}
+        		It is {this.props.ast}
         	</p>
         	);
     }
