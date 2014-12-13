@@ -2,4 +2,10 @@
 'use strict'
 var React = require('react')
 var Hello = require('./Hello')
-React.renderComponent(<Hello />, document.getElementById('content'))
+
+setInterval(function() {
+  React.render(
+    <Hello date={new Date()} />,
+    document.getElementById('content')
+  );
+}, 500);
