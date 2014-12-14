@@ -1,6 +1,8 @@
 'use strict';
 
-// Taken from http://eli.thegreenplace.net/2013/07/16/hand-written-lexer-in-javascript-compared-to-the-regex-based-ones
+var T = require('./tokenTypes');
+
+// Based on http://eli.thegreenplace.net/2013/07/16/hand-written-lexer-in-javascript-compared-to-the-regex-based-ones
 
 var Lexer = function() {
   this.pos = 0;
@@ -9,29 +11,29 @@ var Lexer = function() {
 
   // Operator table, mapping operator -> token name
   this.optable = {
-    '+':  'PLUS',
-    '-':  'MINUS',
-    '*':  'MULTIPLY',
-    '.':  'PERIOD',
-    '\\': 'BACKSLASH',
-    ':':  'COLON',
-    '%':  'PERCENT',
-    '|':  'PIPE',
-    '!':  'EXCLAMATION',
-    '?':  'QUESTION',
-    '#':  'POUND',
-    '&':  'AMPERSAND',
-    ';':  'SEMI',
-    ',':  'COMMA',
-    '(':  'L_PAREN',
-    ')':  'R_PAREN',
-    '<':  'L_ANG',
-    '>':  'R_ANG',
-    '{':  'L_BRACE',
-    '}':  'R_BRACE',
-    '[':  'L_BRACKET',
-    ']':  'R_BRACKET',
-    '=':  'EQUALS'
+    '+': T.PLUS
+  , '-': T.MINUS
+  , '*': T.MULTIPLY
+  , '.': T.PERIOD
+  , '\\': T.BACKSLASH
+  , ':': T.COLON
+  , '%': T.PERCENT
+  , '|': T.PIPE
+  , '!': T.EXCLAMATION
+  , '?': T.QUESTION
+  , '#': T.POUND
+  , '&': T.AMPERSAND
+  , ';': T.SEMI
+  , ',': T.COMMA
+  , '(': T.L_PAREN
+  , ')': T.R_PAREN
+  , '<': T.L_ANG
+  , '>': T.R_ANG
+  , '{': T.L_BRACE
+  , '}': T.R_BRACE
+  , '[': T.L_BRACKET
+  , ']': T.R_BRACKET
+  , '=': T.EQUALS
   };
 }
 
@@ -69,7 +71,7 @@ Lexer.prototype.token = function() {
     if (next_c === '/') {
       return this._process_comment();
     } else {
-      return {name: 'DIVIDE', value: '/', pos: this.pos++};
+      return {name: T.DIVIDE, value: '/', pos: this.pos++};
     }
   } else {
     // Look it up in the table of operators
@@ -120,7 +122,7 @@ Lexer.prototype._process_number = function() {
   }
 
   var tok = {
-    name: 'NUMBER',
+    name: T.NUMBER,
     value: this.buf.substring(this.pos, endpos),
     pos: this.pos
   };
@@ -138,7 +140,7 @@ Lexer.prototype._process_comment = function() {
   }
 
   var tok = {
-    name: 'COMMENT',
+    name: T.COMMENT,
     value: this.buf.substring(this.pos, endpos),
     pos: this.pos
   };
@@ -154,7 +156,7 @@ Lexer.prototype._process_identifier = function() {
   }
 
   var tok = {
-    name: 'IDENTIFIER',
+    name: T.IDENTIFIER,
     value: this.buf.substring(this.pos, endpos),
     pos: this.pos
   };
@@ -170,7 +172,7 @@ Lexer.prototype._process_quote = function() {
     throw Error('Unterminated quote at ' + this.pos);
   } else {
     var tok = {
-      name: 'QUOTE',
+      name: T.QUOTE,
       value: this.buf.substring(this.pos, end_index + 1),
       pos: this.pos
     };

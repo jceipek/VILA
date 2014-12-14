@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 'use strict';
 var React = require('react')
-var Tokenizer = require('./tokenize')
+var Tokenizer = require('./lang/tokenize')
 module.exports = React.createClass({
     displayName: 'HelloReact'
   , getInitialState: function() {

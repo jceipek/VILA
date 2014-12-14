@@ -1,4 +1,4 @@
-var D = require('./data');
+var D = require('../data');
 var VerEx = require("verbal-expressions");
 var Lexer = new (require("./lexer"));
 
