@@ -14,6 +14,11 @@ module.exports = {
                 test: /\.jsx$/,
                 loader: 'jsx-loader?insertPragma=React.DOM&harmony'
             }
+        ,   {
+                //use langloader for all *.pegjs files
+                test: /\.pegjs$/,
+                loader: 'pegjs-loader'
+            }
         ]
     },
     externals: {
@@ -22,6 +27,6 @@ module.exports = {
         'react': 'React'
     },
     resolve: {
-        extensions: ['', '.js', '.jsx']
+        extensions: ['', '.js', '.jsx', '.pegjs']
     }
 }

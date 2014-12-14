@@ -20,6 +20,7 @@
   "homepage": "https://github.com/jceipek/VILA",
   "dependencies": {
     "pegjs": "^0.8.0",
+    "pegjs-loader": "^0.1.1",
     "react": "^0.12.1"
   },
   "devDependencies": {

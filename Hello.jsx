@@ -1,34 +1,32 @@
 /** @jsx React.DOM */
 'use strict';
-var React = require('react')
-var Tokenizer = require('./lang/tokenize')
+var React = require('react');
+var Parser = require('./lang/parser');
+
 module.exports = React.createClass({
     displayName: 'HelloReact'
   , getInitialState: function() {
-    return {ast: []};
+    return {text: ""};
   }
   , handleChange: function (e) {
-    this.setState({ast: e.target.value});
+    this.setState({text: e.target.value});
   }
   , render: function(){
-    var tokenization = Tokenizer.tokenize(this.state.ast);
-    var tokens = tokenization.tokens;
-    var error = tokenization.error;
+    var parse;
+    var error;
+    try {
+      parse = Parser.parse(this.state.text);
+    } catch (e) {
+      error = e.message;
+    }
     return (
       <div>
         <p onChange={this.handleChange}>
           <input type="text" placeholder="Expression Here" />
         </p>
         <p>
-          Tokens:
+          AST: {JSON.stringify(parse)}
         </p>
-        <ol>
-          {tokens.map(function(token) {
-            if (token != null) {
-              return <li key={token.pos}>{JSON.stringify(token)}</li>;
-            }
-          })}
-        </ol>
         <p>
           Error: {error}
         </p>
