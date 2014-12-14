@@ -1,11 +1,12 @@
 {
+  import 'es6-symbol/implement';
   function getPos(col, line) {
     return {line: line, col: col};
   }
 
   function makeAssignmentStatement (sym, expr, pos) {
     return {
-      type: 'S_ASSIGN'
+      type: Symbol.for('S_ASSIGN')
     , symbol: sym
     , expr: expr
     , pos: pos
@@ -14,7 +15,7 @@
 
   function makeSymbol (name, pos) {
     return {
-      type: 'T_SYM'
+      type: Symbol.for('T_SYM')
     , name: name.join('')
     , pos: pos
     };
@@ -22,7 +23,7 @@
 
   function makeCall (sym, expr_list, pos) {
     return {
-      type: 'E_CALL'
+      type: Symbol.for('E_CALL')
     , symbol: sym
     , exprs: expr_list?expr_list:[]
     , pos: pos
@@ -31,7 +32,7 @@
 
   function makeFloat (w, f, pos) {
     return {
-      type: 'T_FLOAT'
+      type: Symbol.for('T_FLOAT')
     , value: { whole: parseInt(w.join('')|0)
              , fractional: parseInt(f.join('')|0)
              }
@@ -41,7 +42,7 @@
 
   function makeInt (value, pos) {
     return {
-      type: 'T_INT'
+      type: Symbol.for('T_INT')
     , value: parseInt(value.join('')|0)
     , pos: pos
     };
@@ -49,7 +50,7 @@
 
   function makeBaseInt (valueList, base, pos) {
     return {
-      type: 'T_BASE_INT'
+      type: Symbol.for('T_BASE_INT')
     , value: valueList.join('')
     , base: base
     , pos: pos
@@ -66,19 +67,19 @@
   }
 
   function makeAdd (a, b, pos) {
-    return _makeBinaryOp(a, b, "E_ADD", pos);
+    return _makeBinaryOp(a, b, Symbol.for('E_ADD'), pos);
   }
 
-  function makeSub (a, b) {
-    return _makeBinaryOp(a, b, "E_SUB", pos);
+  function makeSub (a, b, pos) {
+    return _makeBinaryOp(a, b, Symbol.for('E_SUB'), pos);
   }
 
-  function makeMul (a, b) {
-    return _makeBinaryOp(a, b, "E_MUL", pos);
+  function makeMul (a, b, pos) {
+    return _makeBinaryOp(a, b, Symbol.for('E_MUL'), pos);
   }
 
-  function makeDiv (a, b) {
-    return _makeBinaryOp(a, b, "E_DIV", pos);
+  function makeDiv (a, b, pos) {
+    return _makeBinaryOp(a, b, Symbol.for('E_DIV'), pos);
   }
 }
 
