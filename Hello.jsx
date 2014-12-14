@@ -11,7 +11,9 @@ module.exports = React.createClass({
     this.setState({ast: e.target.value});
   }
   , render: function(){
-    var tokens = Tokenizer.tokenize(this.state.ast);
+    var tokenization = Tokenizer.tokenize(this.state.ast);
+    var tokens = tokenization.tokens;
+    var error = tokenization.error;
     return (
       <div>
         <p onChange={this.handleChange}>
@@ -27,6 +29,9 @@ module.exports = React.createClass({
             }
           })}
         </ol>
+        <p>
+          Error: {error}
+        </p>
       </div>
       );
   }

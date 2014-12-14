@@ -6,15 +6,16 @@ var tokenize = function (str) {
   Lexer.input(str);
   var currToken;
   var tokens = [];
+  var error = null;
   try {
     do {
         currToken = Lexer.token();
         tokens.push(currToken);
     } while (currToken != null);
   } catch (e) {
-
+    error = e.message;
   }
-  return tokens;
+  return {tokens: tokens, error: error};
 }
 
 module.exports = {
