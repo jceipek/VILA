@@ -37,11 +37,21 @@ hex =
   "0x" n:[0-9a-fA-F]+
   { return S.makeBaseInt(n.join(''), 16, getPos(column(), line())); }
 
+bool "boolean" =
+  "True"
+  { return S.makeBool(true, getPos(column(), line())); }
+/ "False"
+  { return S.makeBool(false, getPos(column(), line())); }
+
 number "number" =
   hex
 / binary
 / float
 / int
+
+baseType "primitive type (number or boolean)" =
+  number
+/ bool
 
 ws "whitespace" =
   (" " / "\r" / "\n" / "\t" / "\f")+
@@ -76,7 +86,7 @@ symbol "identifier" =
   { secondPart.unshift(firstPart); return S.makeSymbol(secondPart, getPos(column(), line())); }
 
 factor =
-  ws* n:number ws*
+  ws* n:baseType ws*
   { return n; }
 / ws* s:symbol ws* "(" ws* es:expr_list? ws* ")" ws*
   { return S.makeCall(s, es, getPos(column(), line())); }
