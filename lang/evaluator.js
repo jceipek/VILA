@@ -108,10 +108,10 @@ export default function evaluateASTTree (node, scope) {
   }
   if (S.isBinaryOperator(node.type)) {
     return evaluateBinaryOperator(node, scope);
+  } else if (node.type === S.T_SYM) { // Needs to be above isTerminal because we don't want to evaluate symbols before lookup
+    return evaluateSymbol(node, scope);
   } else if (S.isTerminal(node.type)) {
     return evaluateTerminal(node, scope);
-  } else if (node.type === S.T_SYM) {
-    return evaluateSymbol(node, scope);
   } else {
     throw new Error("ERROR: Cannot yet evaluate " + node.type.toString());
     // S.S_ASSIGN
