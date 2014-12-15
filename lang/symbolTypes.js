@@ -56,12 +56,10 @@ S.makeCall = function (sym, expr_list, pos) {
   };
 };
 
-S.makeFloat = function (w, f, pos) {
+S.makeFloat = function (value, pos) {
   return {
     type: S.T_FLOAT
-  , value: { whole: w
-           , fractional: f
-           }
+  , value: value
   , pos: pos
   };
 };

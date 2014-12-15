@@ -56,10 +56,11 @@ export default React.createClass({
     }
 
     var visualizeBasicTerminal = function (p) {
+      var precision = (p._didLosePrecision?" [lost precision!]":(p._couldLosePrecision?" [could lose precision with other data!]":""));
       return <span>
         {stringifyTitle(p)}
           <ol>
-            <li>{"value: "+JSON.stringify(p.value)}</li>
+            <li>{"value: "+JSON.stringify(p.value)+precision}</li>
           </ol>
         </span>;
     }

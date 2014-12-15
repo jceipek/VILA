@@ -25,9 +25,9 @@ int =
 
 float =
   (whole:digit+ "." fractional:digit*)
-  { return S.makeFloat(coerceStringListToInt(whole), coerceStringListToInt(fractional), getPos(column(), line())); }
+  { return S.makeFloat(coerceStringListToInt(whole) + coerceStringListToInt(fractional)/Math.pow(10,fractional.length), getPos(column(), line())); }
 / (whole:digit* "." fractional:digit+)
-  {return S.makeFloat(coerceStringListToInt(whole), coerceStringListToInt(fractional), getPos(column(), line())); }
+  {return S.makeFloat(coerceStringListToInt(whole) + coerceStringListToInt(fractional)/Math.pow(10,fractional.length), getPos(column(), line())); }
 
 binary =
   "0b" n:[0-1]+

@@ -3,6 +3,8 @@ import S from './symbolTypes';
 var evaluateAdd = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
     return S.makeInt(a.value + b.value, pos);
+  } else if (a.type === S.T_FLOAT && b.type === S.T_FLOAT) {
+    return S.makeFloat(a.value + b.value, pos);
   } else {
     throw new Error("Error: We don't yet support addition on "+a.type.toString()+" and "+b.type.toString());
   }
@@ -11,6 +13,8 @@ var evaluateAdd = function (a, b, pos, scope) {
 var evaluateSub = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
     return S.makeInt(a.value - b.value, pos);
+  } else if (a.type === S.T_FLOAT && b.type === S.T_FLOAT) {
+    return S.makeFloat(a.value - b.value, pos);
   } else {
     throw new Error("Error: We don't yet support subtraction on "+a.type.toString()+" and "+b.type.toString());
   }
@@ -19,6 +23,8 @@ var evaluateSub = function (a, b, pos, scope) {
 var evaluateMul = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
     return S.makeInt(a.value * b.value, pos);
+  } else if (a.type === S.T_FLOAT && b.type === S.T_FLOAT) {
+    return S.makeFloat(a.value * b.value, pos);
   } else {
     throw new Error("Error: We don't yet support multiplication on "+a.type.toString()+" and "+b.type.toString());
   }
@@ -26,14 +32,25 @@ var evaluateMul = function (a, b, pos, scope) {
 
 var evaluateDiv = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
-    return S.makeInt(Math.floor(a.value / b.value), pos);
+    var div = a.value / b.value;
+    var f = Math.trunc(div); // floor doesn't work correctly for negative numbers
+    var res = S.makeInt(f, pos);
+    res._couldLosePrecision = true;
+    res._didLosePrecision = (f !== div);
+    return res;
+  } else if (a.type === S.T_FLOAT && b.type === S.T_FLOAT) {
+    return S.makeFloat(a.value / b.value, pos);
   } else {
     throw new Error("Error: We don't yet support division on "+a.type.toString()+" and "+b.type.toString());
   }
 };
 
 var evaluateEq = function (a, b, pos, scope) {
-  if (a.type === S.T_INT && b.type === S.T_INT) {
+  if (a.type !== b.type) {
+    return S.makeBool(false, pos);
+  } else if (a.type === S.T_INT || // Don't need to check b because we know the types match
+             a.type === S.T_FLOAT ||
+             a.type === S.T_BOOL) {
     return S.makeBool(a.value == b.value, pos);
   } else {
     throw new Error("Error: We don't yet support equivalence checks on "+a.type.toString()+" and "+b.type.toString());
