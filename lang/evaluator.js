@@ -1,32 +1,47 @@
 import S from './symbolTypes';
 
+var makeAssignment = function (sym, r) {
+  return { status: 'ASSIGNMENT', symbol: sym, value: r };
+}
+
+var makeResult = function (r) {
+  return { status: 'RESULT', res: r };
+}
+
+var makeError = function (e, vals, pos) {
+  return { status: 'ERROR', message: e, involvedValues: vals, pos: pos };
+}
+
 var evaluateAdd = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
-    return S.makeInt(a.value + b.value, pos);
+    return makeResult(S.makeInt(a.value + b.value, pos));
   } else if (a.type === S.T_FLOAT && b.type === S.T_FLOAT) {
-    return S.makeFloat(a.value + b.value, pos);
+    return makeResult(S.makeFloat(a.value + b.value, pos));
   } else {
-    throw new Error("Error: We don't yet support addition on "+a.type.toString()+" and "+b.type.toString());
+    return makeError("I don't understand addition on "+a.type.toString()+" and "+b.type.toString()
+                    , [a, b], pos);
   }
 };
 
 var evaluateSub = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
-    return S.makeInt(a.value - b.value, pos);
+    return makeResult(S.makeInt(a.value - b.value, pos));
   } else if (a.type === S.T_FLOAT && b.type === S.T_FLOAT) {
-    return S.makeFloat(a.value - b.value, pos);
+    return makeResult(S.makeFloat(a.value - b.value, pos));
   } else {
-    throw new Error("Error: We don't yet support subtraction on "+a.type.toString()+" and "+b.type.toString());
+    return makeError("I don't understand subtraction on "+a.type.toString()+" and "+b.type.toString()
+                    , [a, b], pos);
   }
 };
 
 var evaluateMul = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
-    return S.makeInt(a.value * b.value, pos);
+    return makeResult(S.makeInt(a.value * b.value, pos));
   } else if (a.type === S.T_FLOAT && b.type === S.T_FLOAT) {
-    return S.makeFloat(a.value * b.value, pos);
+    return makeResult(S.makeFloat(a.value * b.value, pos));
   } else {
-    throw new Error("Error: We don't yet support multiplication on "+a.type.toString()+" and "+b.type.toString());
+    return makeError("I don't understand multiplication on "+a.type.toString()+" and "+b.type.toString()
+                    , [a, b], pos);
   }
 };
 
@@ -37,33 +52,36 @@ var evaluateDiv = function (a, b, pos, scope) {
     var res = S.makeInt(f, pos);
     res._couldLosePrecision = true;
     res._didLosePrecision = (f !== div);
-    return res;
+    return makeResult(res);
   } else if (a.type === S.T_FLOAT && b.type === S.T_FLOAT) {
-    return S.makeFloat(a.value / b.value, pos);
+    return makeResult(S.makeFloat(a.value / b.value, pos));
   } else {
-    throw new Error("Error: We don't yet support division on "+a.type.toString()+" and "+b.type.toString());
+    return makeError("I don't understand division on "+a.type.toString()+" and "+b.type.toString()
+                    , [a, b], pos);
   }
 };
 
 var evaluateEq = function (a, b, pos, scope) {
   if (a.type !== b.type) {
-    return S.makeBool(false, pos);
+    return makeResult(S.makeBool(false, pos));
   } else if (a.type === S.T_INT || // Don't need to check b because we know the types match
              a.type === S.T_FLOAT ||
              a.type === S.T_BOOL) {
-    return S.makeBool(a.value == b.value, pos);
+    return makeResult(S.makeBool(a.value == b.value, pos));
   } else {
-    throw new Error("Error: We don't yet support equivalence checks on "+a.type.toString()+" and "+b.type.toString());
+    return makeError("I don't understand equivalence checks on "+a.type.toString()+" and "+b.type.toString()
+                    , [a, b], pos);
   }
 };
 
 var evaluateNeg = function (node, pos, scope) {
   if (node.type === S.T_INT) {
-    return S.makeInt(-node.value, pos);
+    return makeResult(S.makeInt(-node.value, pos));
   } else if (node.type === S.T_FLOAT) {
-    return S.makeFloat(-node.value, pos);
+    return makeResult(S.makeFloat(-node.value, pos));
   } else {
-    throw new Error("Error: We don't yet support neg on "+node.type.toString());
+    return makeError("I don't understand negation on "+node.type.toString()
+                    , [node], pos);
   }
 };
 
@@ -71,11 +89,17 @@ var evaluateUnaryOperator = function (node, scope) {
   var res = node.value;
   if (!S.isTerminal(res)) {
     res = evaluateASTTree(node.value, scope);
+    if (res.status === 'ERROR') {
+      return res;
+    }
   }
   if (node.type === S.E_NEG) {
-    res = evaluateNeg(res, node.pos, scope);
+    res = evaluateNeg(res.res, node.pos, scope);
   }
   node._cachedResult = res;
+  if (res.status === 'ERROR') {
+    return res;
+  }
   return res;
 }
 
@@ -84,9 +108,17 @@ var evaluateBinaryOperator = function (node, scope) {
   var resB = node.valueB;
   if (!S.isTerminal(resA)) {
     resA = evaluateASTTree(node.valueA, scope);
+    if (resA.status === 'ERROR') {
+      return resA;
+    }
+    resA = resA.res;
   }
   if (!S.isTerminal(resB)) {
     resB = evaluateASTTree(node.valueB, scope);
+    if (resB.status === 'ERROR') {
+      return resB;
+    }
+    resB = resB.res;
   }
 
   var res = null;
@@ -102,21 +134,41 @@ var evaluateBinaryOperator = function (node, scope) {
     res = evaluateEq(resA, resB, node.pos, scope);
   }
   node._cachedResult = res;
+  if (res.status === 'ERROR') {
+    return res;
+  }
   return res;
 }
 
 var evaluateTerminal = function (node, scope) {
-  return node;
+  return makeResult(node);
 };
 
 var evaluateSymbol = function (node, scope) {
+  // TODO: Think about optimizing this if it becomes a bottleneck;
+  // it has to walk the scope 2x for the sake of avoiding try/catch
+  if (scope.scopeOfSymbol(node.name) === null) {
+    var e = makeError("I can't find "+node.name.toString()+" in my scope or parent scopes :("
+                    , [node], node.pos);
+    node._cachedResult = e;
+    return e;
+  }
   var s = scope.lookupSymbolValue(node.name);
   s.pos = node.pos; // pos actually doesn't make much sense for values
                     // mapped to symbols in the scope contents.
                     // However, when we do a symbol lookup, we can set it
                     // to the pos of the symbol we replaced.
+  s = makeResult(s);
   node._cachedResult = s;
   return s;
+};
+
+var evaluateAssign = function (node, scope) {
+  var res = evaluateASTTree(node.expr, scope);
+  if (res.status === 'ERROR') {
+    return res;
+  }
+  return makeAssignment(node.symbol, res.res);
 };
 
 // NOTE: As this is architected, this MUST NOT modify the scope. EVER.
@@ -128,7 +180,9 @@ export default function evaluateASTTree (node, scope) {
   if (!node) {
     return;
   }
-  if (S.isUnaryOperator(node.type)) {
+  if (node.type === S.S_ASSIGN) {
+    return evaluateAssign(node, scope);
+  } else if (S.isUnaryOperator(node.type)) {
     return evaluateUnaryOperator(node, scope);
   } else if (S.isBinaryOperator(node.type)) {
     return evaluateBinaryOperator(node, scope);
@@ -137,8 +191,8 @@ export default function evaluateASTTree (node, scope) {
   } else if (S.isTerminal(node.type)) {
     return evaluateTerminal(node, scope);
   } else {
-    throw new Error("ERROR: Cannot yet evaluate " + node.type.toString());
-    // S.S_ASSIGN
+    return makeError("I don't understand "+node.type.toString()
+                    , [node], node.pos);
     // S.E_CALL
   }
 };

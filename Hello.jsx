@@ -29,17 +29,20 @@ export default React.createClass({
       error.push(e.message);
     }
 
-    try {
-      result = evaluateASTTree(parse, testScope);
-    } catch (e) {
-      error.push(e.message);
-    }
+    result = evaluateASTTree(parse, testScope);
+
+    var visualizeSimpleEvaluationResponse = function (res) {
+      if (res.status === 'ERROR') {
+        return <em> {res.message} </em>;
+      }
+      return <span>{visualizeTree(res.res)}</span>;
+    };
 
     var stringifyTitle = function (p) {
       if (p.hasOwnProperty('_cachedResult')) {
         return <span>
           <h3>{p.type.toString() + " [" + p.pos.col + ", " + p.pos.line + "]"}</h3>
-          <ul><li>{visualizeTree(p._cachedResult)}</li></ul>
+          <ul><li>{visualizeSimpleEvaluationResponse(p._cachedResult)}</li></ul>
         </span>;
       } else {
         return <h3>{p.type.toString() + " [" + p.pos.col + ", " + p.pos.line + "]"}</h3>;
@@ -114,6 +117,22 @@ export default React.createClass({
 
     };
 
+    var visualizeEvaluationResponse = function (res) {
+      if (res.status === 'ERROR') {
+        return <em>
+        {res.message}
+        at
+        [{res.pos.col},{res.pos.line}]
+        involving
+        {res.involvedValues.map((v,i) => {return <li key={i}>{visualizeTree(v)}</li>;})}
+        </em>
+      }
+      if (res.status === 'ASSIGNMENT') {
+        return <span>Set {visualizeTree(res.symbol)} to {visualizeTree(res.value)}</span>;
+      }
+      return <span>{visualizeTree(res.res)}</span>;
+    };
+
     return (
       <div>
         <p onChange={this.handleChange}>
@@ -124,14 +143,14 @@ export default React.createClass({
         </p>
         {visualizeTree(parse)}
         <p>
-          Errors:
+          Lexing Errors:
           <ul>
             {error.map((x,i) => {return <li key={i}>{x}</li>})}
           </ul>
         </p>
         <p>
-          Result:
-          {visualizeTree(result)}
+          Result:<br/>
+          {result?visualizeEvaluationResponse(result):""}
         </p>
       </div>
       );
