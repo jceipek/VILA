@@ -4,6 +4,12 @@ import 'react';
 var Parser = require('./lang/parser');
 import S from './lang/symbolTypes';
 import evaluateASTTree from './lang/evaluator';
+import Scope from './lang/scope';
+
+var testScope = new Scope();
+
+testScope.setSymbolValue('a', S.makeInt(5, null));
+testScope.setSymbolValue('b', S.makeInt(2, null));
 
 export default React.createClass({
     displayName: 'HelloReact'
@@ -24,7 +30,7 @@ export default React.createClass({
     }
 
     try {
-      result = evaluateASTTree(parse);
+      result = evaluateASTTree(parse, testScope);
     } catch (e) {
       error.push(e.message);
     }

@@ -60,7 +60,7 @@ eterm =
   first:term "+" second:eterm
   { return S.makeAdd(first, second, getPos(column(), line())); }
 / first:term "-" second:eterm
-  { return S.makeAdd(first, second, getPos(column(), line())); }
+  { return S.makeSub(first, second, getPos(column(), line())); }
 / term
 
 term =

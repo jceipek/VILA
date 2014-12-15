@@ -1,6 +1,6 @@
 import S from './symbolTypes';
 
-var evaluateAdd = function (a, b, pos) {
+var evaluateAdd = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
     return S.makeInt(a.value + b.value, pos);
   } else {
@@ -8,7 +8,7 @@ var evaluateAdd = function (a, b, pos) {
   }
 };
 
-var evaluateSub = function (a, b, pos) {
+var evaluateSub = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
     return S.makeInt(a.value - b.value, pos);
   } else {
@@ -16,7 +16,7 @@ var evaluateSub = function (a, b, pos) {
   }
 };
 
-var evaluateMul = function (a, b, pos) {
+var evaluateMul = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
     return S.makeInt(a.value * b.value, pos);
   } else {
@@ -24,7 +24,7 @@ var evaluateMul = function (a, b, pos) {
   }
 };
 
-var evaluateDiv = function (a, b, pos) {
+var evaluateDiv = function (a, b, pos, scope) {
   if (a.type === S.T_INT && b.type === S.T_INT) {
     return S.makeInt(Math.floor(a.value / b.value), pos);
   } else {
@@ -32,55 +32,71 @@ var evaluateDiv = function (a, b, pos) {
   }
 };
 
-var evaluateBinaryOperator = function (node) {
+var evaluateBinaryOperator = function (node, scope) {
   var resA = node.valueA;
   var resB = node.valueB;
   if (!S.isTerminal(node.valueA)) {
-    resA = evaluateASTTree(node.valueA);
+    resA = evaluateASTTree(node.valueA, scope);
   }
   if (!S.isTerminal(node.valueB)) {
-    resB = evaluateASTTree(node.valueB);
+    resB = evaluateASTTree(node.valueB, scope);
   }
 
   var res = null;
   if (node.type === S.E_ADD) {
-    res = evaluateAdd(resA, resB, node.pos);
+    res = evaluateAdd(resA, resB, node.pos, scope);
   } else if (node.type === S.E_SUB) {
-    res = evaluateSub(resA, resB, node.pos);
+    res = evaluateSub(resA, resB, node.pos, scope);
   } else if (node.type === S.E_MUL) {
-    res = evaluateMul(resA, resB, node.pos);
+    res = evaluateMul(resA, resB, node.pos, scope);
   } else if (node.type === S.E_DIV) {
-    res = evaluateDiv(resA, resB, node.pos);
+    res = evaluateDiv(resA, resB, node.pos, scope);
   }
   node._cachedResult = res;
   return res;
 }
 
-var evaluateInt = function (node) {
+var evaluateInt = function (node, scope) {
   return node;
 };
 
-var evaluateBaseInt = function (node) {
+var evaluateBaseInt = function (node, scope) {
   return node;
 };
 
-var evaluateFloat = function (node) {
+var evaluateFloat = function (node, scope) {
   return node;
 };
 
+var evaluateSymbol = function (node, scope) {
+  var s = scope.lookupSymbolValue(node.name);
+  s.pos = node.pos; // pos actually doesn't make much sense for values
+                    // mapped to symbols in the scope contents.
+                    // However, when we do a symbol lookup, we can set it
+                    // to the pos of the symbol we replaced.
+  node._cachedResult = s;
+  return s;
+};
 
-export default function evaluateASTTree (node) {
+// NOTE: As this is architected, this MUST NOT modify the scope. EVER.
+// Otherwise, all of the time travelling stuff won't work.
+// This means that functions must be externally pure. i.e. a function
+// can modify its own local variables but may not modify
+// variables external to its scope.
+export default function evaluateASTTree (node, scope) {
   if (!node) {
     return;
   }
   if (S.isBinaryOperator(node.type)) {
-    return evaluateBinaryOperator(node);
+    return evaluateBinaryOperator(node, scope);
   } else if (node.type === S.T_INT) {
-    return evaluateInt(node);
+    return evaluateInt(node, scope);
   } else if (node.type === S.T_BASE_INT) {
-    return evaluateBaseInt(node);
+    return evaluateBaseInt(node, scope);
   } else if (node.type === S.T_FLOAT) {
-    return evaluateFloat(node);
+    return evaluateFloat(node, scope);
+  } else if (node.type === S.T_SYM) {
+    return evaluateSymbol(node, scope);
   } else {
     throw new Error("ERROR: Cannot yet evaluate " + node.type.toString());
     // S.S_ASSIGN

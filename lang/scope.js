@@ -11,13 +11,13 @@ export default class Scope {
     this.contents = {};
   }
 
-  doesSymbolExist (symbol) {
+  scopeOfSymbol (symbol) {
     if (this.contents.hasOwnProperty(symbol)) {
-      return true;
+      return 0; // current scope
     } else if (this.parentScope != null) {
-      return this.parentScope.doesSymbolExist(symbol);
+      return 1+this.parentScope.scopeOfSymbol(symbol); // scope n
     } else {
-      return false;
+      return null; // not available in the scope hierarchy
     }
   }
 
