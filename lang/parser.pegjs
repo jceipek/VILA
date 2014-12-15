@@ -47,7 +47,8 @@ ws "whitespace" =
   (" " / "\r" / "\n" / "\t" / "\f")+
 
 expr =
-  eterm "=" eterm
+  first:eterm "=" second:eterm
+  { return S.makeEq(first, second, getPos(column(), line())); }
 / eterm
 
 expr_list =

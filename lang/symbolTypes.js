@@ -2,6 +2,7 @@ import 'es6-symbol/implement';
 var S = {
   S_ASSIGN: Symbol.for('S_ASSIGN')
 , E_CALL: Symbol.for('E_CALL')
+, E_EQ: Symbol.for('E_EQ')
 , E_ADD: Symbol.for('E_ADD')
 , E_SUB: Symbol.for('E_SUB')
 , E_MUL: Symbol.for('E_MUL')
@@ -9,6 +10,7 @@ var S = {
 , T_SYM: Symbol.for('T_SYM')
 , T_FLOAT: Symbol.for('T_FLOAT')
 , T_INT: Symbol.for('T_INT')
+, T_BOOL: Symbol.for('T_BOOL')
 , T_BASE_INT: Symbol.for('T_BASE_INT')
 };
 
@@ -16,14 +18,16 @@ S.isTerminal = function (t) {
     return t === S.T_SYM ||
            t === S.T_FLOAT ||
            t === S.T_INT ||
-           t === S.T_BASE_INT;
+           t === S.T_BASE_INT ||
+           t === S.T_BOOL;
 };
 
 S.isBinaryOperator = function (b) {
     return b === S.E_ADD ||
            b === S.E_SUB ||
            b === S.E_MUL ||
-           b === S.E_DIV;
+           b === S.E_DIV ||
+           b === S.E_EQ;
 };
 
 S.makeAssignmentStatement = function (sym, expr, pos) {
@@ -70,6 +74,14 @@ S.makeInt = function (value, pos) {
   };
 };
 
+S.makeBool = function (value, pos) {
+  return {
+    type: S.T_BOOL
+  , value: value
+  , pos: pos
+  };
+};
+
 S.makeBaseInt = function (strValue, base, pos) {
   return {
     type: S.T_BASE_INT
@@ -102,6 +114,10 @@ S.makeMul = function (a, b, pos) {
 
 S.makeDiv = function (a, b, pos) {
   return _makeBinaryOp(a, b, S.E_DIV, pos);
+};
+
+S.makeEq = function (a, b, pos) {
+  return _makeBinaryOp(a, b, S.E_EQ, pos);
 };
 
 export default S;

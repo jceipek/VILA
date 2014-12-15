@@ -32,6 +32,14 @@ var evaluateDiv = function (a, b, pos, scope) {
   }
 };
 
+var evaluateEq = function (a, b, pos, scope) {
+  if (a.type === S.T_INT && b.type === S.T_INT) {
+    return S.makeBool(a.value == b.value, pos);
+  } else {
+    throw new Error("Error: We don't yet support equivalence checks on "+a.type.toString()+" and "+b.type.toString());
+  }
+};
+
 var evaluateBinaryOperator = function (node, scope) {
   var resA = node.valueA;
   var resB = node.valueB;
@@ -51,20 +59,14 @@ var evaluateBinaryOperator = function (node, scope) {
     res = evaluateMul(resA, resB, node.pos, scope);
   } else if (node.type === S.E_DIV) {
     res = evaluateDiv(resA, resB, node.pos, scope);
+  } else if (node.type === S.E_EQ) {
+    res = evaluateEq(resA, resB, node.pos, scope);
   }
   node._cachedResult = res;
   return res;
 }
 
-var evaluateInt = function (node, scope) {
-  return node;
-};
-
-var evaluateBaseInt = function (node, scope) {
-  return node;
-};
-
-var evaluateFloat = function (node, scope) {
+var evaluateTerminal = function (node, scope) {
   return node;
 };
 
@@ -89,18 +91,13 @@ export default function evaluateASTTree (node, scope) {
   }
   if (S.isBinaryOperator(node.type)) {
     return evaluateBinaryOperator(node, scope);
-  } else if (node.type === S.T_INT) {
-    return evaluateInt(node, scope);
-  } else if (node.type === S.T_BASE_INT) {
-    return evaluateBaseInt(node, scope);
-  } else if (node.type === S.T_FLOAT) {
-    return evaluateFloat(node, scope);
+  } else if (S.isTerminal(node.type)) {
+    return evaluateTerminal(node, scope);
   } else if (node.type === S.T_SYM) {
     return evaluateSymbol(node, scope);
   } else {
     throw new Error("ERROR: Cannot yet evaluate " + node.type.toString());
     // S.S_ASSIGN
-    // S.T_SYM
     // S.E_CALL
   }
 };

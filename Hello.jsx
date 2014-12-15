@@ -46,6 +46,24 @@ export default React.createClass({
       }
     }
 
+    var visualizeSymbol = function (p) {
+      return <span>
+        {stringifyTitle(p)}
+          <ol>
+            <li>{"name: "+p.name}</li>
+          </ol>
+        </span>;
+    }
+
+    var visualizeBasicTerminal = function (p) {
+      return <span>
+        {stringifyTitle(p)}
+          <ol>
+            <li>{"value: "+JSON.stringify(p.value)}</li>
+          </ol>
+        </span>;
+    }
+
     var visualizeTree = function (p) {
       if (!p) return "";
       if (p.type === S.S_ASSIGN) {
@@ -57,10 +75,7 @@ export default React.createClass({
               </ol>
             </span>;
       }
-      if (p.type === S.E_ADD ||
-          p.type === S.E_SUB ||
-          p.type === S.E_MUL ||
-          p.type === S.E_DIV) {
+      if (S.isBinaryOperator(p.type)) {
         return <span>
             {stringifyTitle(p)}
             <ol>
@@ -78,39 +93,16 @@ export default React.createClass({
             </ol>
         </span>
       }
-      if (p.type === S.T_INT) {
-        return <span>
-          {stringifyTitle(p)}
-            <ol>
-              <li>{"value: "+p.value}</li>
-            </ol>
-          </span>;
-      }
-      if (p.type === S.T_FLOAT) {
-        return <span>
-          {stringifyTitle(p)}
-            <ol>
-              <li>{"value: "+JSON.stringify(p.value)}</li>
-            </ol>
-          </span>;
-      }
-      if (p.type === S.T_BASE_INT) {
-        return <span>
-          {stringifyTitle(p)}
-            <ol>
-              <li>{"strValue: "+p.strValue}</li>
-              <li>{"base: "+p.base}</li>
-            </ol>
-          </span>;
+      if (p.type === S.T_INT ||
+          p.type === S.T_BOOL ||
+          p.type === S.T_FLOAT ||
+          p.type === S.T_BASE_INT) {
+          return visualizeBasicTerminal(p);
       }
       if (p.type === S.T_SYM) {
-        return <span>
-          {stringifyTitle(p)}
-            <ol>
-              <li>{"name: "+p.name}</li>
-            </ol>
-          </span>;
+        return visualizeSymbol(p);
       }
+
     };
 
     return (
