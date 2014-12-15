@@ -6,6 +6,10 @@
   function coerceStringListToInt (strList) {
     return parseInt(strList.join('')|0);
   }
+  function coerceWholeAndFractionalListsToFloat(w, f) {
+    return coerceStringListToInt(whole) +
+           coerceStringListToInt(fractional)/Math.pow(10,fractional.length);
+  }
 }
 
 start =
@@ -20,14 +24,18 @@ digit =
   [0-9]
 
 int =
-  whole:digit+
-  { return S.makeInt(coerceStringListToInt(whole), getPos(column(), line())); }
+  neg:"-"? whole:digit+
+  { return S.makeInt((neg?(-1):1) * coerceStringListToInt(whole), getPos(column(), line())); }
 
 float =
-  (whole:digit+ "." fractional:digit*)
-  { return S.makeFloat(coerceStringListToInt(whole) + coerceStringListToInt(fractional)/Math.pow(10,fractional.length), getPos(column(), line())); }
-/ (whole:digit* "." fractional:digit+)
-  {return S.makeFloat(coerceStringListToInt(whole) + coerceStringListToInt(fractional)/Math.pow(10,fractional.length), getPos(column(), line())); }
+  (neg:("-"?) whole:digit+ "." fractional:digit*)
+  {
+    return S.makeFloat((neg?(-1):1) * coerceWholeAndFractionalListsToFloat(whole, fractional), getPos(column(), line()));
+  }
+/ (neg:("-"?) whole:digit* "." fractional:digit+)
+  {
+    return S.makeFloat((neg?(-1):1) * coerceWholeAndFractionalListsToFloat(whole, fractional), getPos(column(), line()));
+  }
 
 binary =
   "0b" n:[0-1]+
