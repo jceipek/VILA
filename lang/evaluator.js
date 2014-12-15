@@ -57,13 +57,35 @@ var evaluateEq = function (a, b, pos, scope) {
   }
 };
 
+var evaluateNeg = function (node, pos, scope) {
+  if (node.type === S.T_INT) {
+    return S.makeInt(-node.value, pos);
+  } else if (node.type === S.T_FLOAT) {
+    return S.makeFloat(-node.value, pos);
+  } else {
+    throw new Error("Error: We don't yet support neg on "+node.type.toString());
+  }
+};
+
+var evaluateUnaryOperator = function (node, scope) {
+  var res = node.value;
+  if (!S.isTerminal(res)) {
+    res = evaluateASTTree(node.value, scope);
+  }
+  if (node.type === S.E_NEG) {
+    res = evaluateNeg(res, node.pos, scope);
+  }
+  node._cachedResult = res;
+  return res;
+}
+
 var evaluateBinaryOperator = function (node, scope) {
   var resA = node.valueA;
   var resB = node.valueB;
-  if (!S.isTerminal(node.valueA)) {
+  if (!S.isTerminal(resA)) {
     resA = evaluateASTTree(node.valueA, scope);
   }
-  if (!S.isTerminal(node.valueB)) {
+  if (!S.isTerminal(resB)) {
     resB = evaluateASTTree(node.valueB, scope);
   }
 
@@ -106,7 +128,9 @@ export default function evaluateASTTree (node, scope) {
   if (!node) {
     return;
   }
-  if (S.isBinaryOperator(node.type)) {
+  if (S.isUnaryOperator(node.type)) {
+    return evaluateUnaryOperator(node, scope);
+  } else if (S.isBinaryOperator(node.type)) {
     return evaluateBinaryOperator(node, scope);
   } else if (node.type === S.T_SYM) { // Needs to be above isTerminal because we don't want to evaluate symbols before lookup
     return evaluateSymbol(node, scope);

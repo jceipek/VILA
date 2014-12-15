@@ -6,7 +6,7 @@
   function coerceStringListToInt (strList) {
     return parseInt(strList.join('')|0);
   }
-  function coerceWholeAndFractionalListsToFloat(w, f) {
+  function coerceWholeAndFractionalListsToFloat(whole, fractional) {
     return coerceStringListToInt(whole) +
            coerceStringListToInt(fractional)/Math.pow(10,fractional.length);
   }
@@ -93,8 +93,14 @@ symbol "identifier" =
   firstPart:[a-zA-Z] secondPart:[a-zA-Z0-9]*
   { secondPart.unshift(firstPart); return S.makeSymbol(secondPart, getPos(column(), line())); }
 
+unaryOp =
+  "-" f:factor
+  { return S.makeNeg(f, getPos(column(), line())); }
+
 factor =
-  ws* n:baseType ws*
+  ws* u:unaryOp ws*
+  { return u; }
+/ ws* n:baseType ws*
   { return n; }
 / ws* s:symbol ws* "(" ws* es:expr_list? ws* ")" ws*
   { return S.makeCall(s, es, getPos(column(), line())); }
@@ -102,4 +108,3 @@ factor =
   { return s; }
 / ws* "(" ws* es:expr ws* ")" ws*
   { return es; }
-

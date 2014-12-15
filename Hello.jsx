@@ -94,6 +94,14 @@ export default React.createClass({
             </ol>
         </span>
       }
+      if (p.type === S.E_NEG) {
+        return <span>
+          {stringifyTitle(p)}
+            <ol>
+              <li>{visualizeTree(p.value)}</li>
+            </ol>
+        </span>
+      }
       if (p.type === S.T_INT ||
           p.type === S.T_BOOL ||
           p.type === S.T_FLOAT ||

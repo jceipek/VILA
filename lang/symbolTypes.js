@@ -3,6 +3,7 @@ var S = {
   S_ASSIGN: Symbol.for('S_ASSIGN')
 , E_CALL: Symbol.for('E_CALL')
 , E_EQ: Symbol.for('E_EQ')
+, E_NEG: Symbol.for('E_NEG')
 , E_ADD: Symbol.for('E_ADD')
 , E_SUB: Symbol.for('E_SUB')
 , E_MUL: Symbol.for('E_MUL')
@@ -28,6 +29,10 @@ S.isBinaryOperator = function (b) {
            b === S.E_MUL ||
            b === S.E_DIV ||
            b === S.E_EQ;
+};
+
+S.isUnaryOperator = function (u) {
+    return u === S.E_NEG;
 };
 
 S.makeAssignmentStatement = function (sym, expr, pos) {
@@ -116,6 +121,14 @@ S.makeDiv = function (a, b, pos) {
 
 S.makeEq = function (a, b, pos) {
   return _makeBinaryOp(a, b, S.E_EQ, pos);
+};
+
+S.makeNeg = function (value, pos) {
+  return {
+    type: S.E_NEG
+  , value: value
+  , pos: pos
+  };
 };
 
 export default S;
