@@ -47,98 +47,111 @@ var evaluateMul = function (a, b, pos, scope) {
 };
 
 var evaluateDiv = function (a, b, pos, scope) {
-  if (M.get(a,'type') === S.T_INT && M.get(b,'type') === S.T_INT) {
-    var div = M.get(a, 'value') / M.get(b,'value');
+  var a_type = M.get(a,'type');
+  var b_type = M.get(b,'type');
+  var a_value = M.get(a, 'value');
+  var b_value = M.get(b, 'value');
+  if (a_type === S.T_INT && b_type === S.T_INT) {
+    var div = a_value / b_value;
     var f = Math.trunc(div); // floor doesn't work correctly for negative numbers
     var res = S.makeInt(f, pos);
     res._couldLosePrecision = true;
     res._didLosePrecision = (f !== div);
     return makeResult(res);
-  } else if (M.get(a,'type') === S.T_FLOAT && M.get(b,'type') === S.T_FLOAT) {
-    return makeResult(S.makeFloat(M.get(a, 'value') / M.get(b,'value'), pos));
+  } else if (a_type === S.T_FLOAT && b_type === S.T_FLOAT) {
+    return makeResult(S.makeFloat(a_value / b_value, pos));
   } else {
-    return makeError("I don't understand division on "+M.get(a,'type').toString()+" and "+M.get(b,'type').toString()
+    return makeError("I don't understand division on "+a_type.toString()+" and "+b_type.toString()
                     , [a, b], pos);
   }
 };
 
 var evaluateEq = function (a, b, pos, scope) {
-  if (M.get(a,'type') !== M.get(b,'type')) {
+  var a_type = M.get(a,'type');
+  var b_type = M.get(b,'type');
+  if (a_type !== b_type) {
     return makeResult(S.makeBool(false, pos));
-  } else if (M.get(a,'type') === S.T_INT || // Don't need to check b because we know the types match
-             M.get(a,'type') === S.T_FLOAT ||
-             M.get(a,'type') === S.T_BOOL) {
+  } else if (a_type === S.T_INT || // Don't need to check b because we know the types match
+             a_type === S.T_FLOAT ||
+             a_type === S.T_BOOL) {
     return makeResult(S.makeBool(M.get(a, 'value') == M.get(b,'value'), pos));
   } else {
-    return makeError("I don't understand equivalence checks on "+M.get(a,'type').toString()+" and "+M.get(b,'type').toString()
+    return makeError("I don't understand equivalence checks on "+a_type.toString()+" and "+b_type.toString()
                     , [a, b], pos);
   }
 };
 
 var evaluateNeg = function (node, pos, scope) {
-  if (M.get(node,'type') === S.T_INT) {
-    return makeResult(S.makeInt(-M.get(node,'value'), pos));
-  } else if (M.get(node,'type') === S.T_FLOAT) {
-    return makeResult(S.makeFloat(-M.get(node,'value'), pos));
+  var node_type = M.get(node,'type');
+  var node_value = M.get(node,'value');
+  if (node_type === S.T_INT) {
+    return makeResult(S.makeInt(-node_value, pos));
+  } else if (node_type === S.T_FLOAT) {
+    return makeResult(S.makeFloat(-node_value, pos));
   } else {
-    return makeError("I don't understand negation on "+M.get(node,'type').toString()
+    return makeError("I don't understand negation on "+node_type.toString()
                     , [node], pos);
   }
 };
 
 var evaluateUnaryOperator = function (node, scope) {
-  var res = M.get(node,'value');
-  if (!S.isTerminal(res)) {
-    res = evaluateASTTree(res, scope);
+  var val = M.get(node,'value');
+  var res;
+  if (!S.isTerminal(val)) {
+    res = evaluateASTTree(val, scope);
     if (res.status === 'ERROR') {
       return res;
     }
+    val = res.res;
   }
-  if (M.get(node,'type') === S.E_NEG) {
-    res = evaluateNeg(res.res, M.get(node,'pos'), scope);
+  var node_pos = M.get(node,'pos');
+  var node_type = M.get(node,'type');
+  if (node_type === S.E_NEG) {
+    res = evaluateNeg(val, node_pos, scope);
+  } else {
+    return makeError("I don't understand the unary operator "+node_type.toString()
+                    , [node], node_pos);
   }
   node._cachedResult = res;
-  if (res.status === 'ERROR') {
-    return res;
-  }
   return res;
 }
 
 var evaluateBinaryOperator = function (node, scope) {
-  var resA = M.get(node,'valueA');
-  var resB = M.get(node,'valueB');
-  if (!S.isTerminal(resA)) {
-    resA = evaluateASTTree(resA, scope);
+  var valA = M.get(node,'valueA');
+  var valB = M.get(node,'valueB');
+  if (!S.isTerminal(valA)) {
+    var resA = evaluateASTTree(valA, scope);
     if (resA.status === 'ERROR') {
       return resA;
     }
-    resA = resA.res;
+    valA = resA.res;
   }
-  if (!S.isTerminal(resB)) {
-    resB = evaluateASTTree(resB, scope);
+  if (!S.isTerminal(valB)) {
+    var resB = evaluateASTTree(valB, scope);
     if (resB.status === 'ERROR') {
       return resB;
     }
-    resB = resB.res;
+    valB = resB.res;
   }
 
   var res = null;
-  var pos = M.get(node, 'pos');
-  if (M.get(node,'type') === S.E_ADD) {
-    res = evaluateAdd(resA, resB, pos, scope);
-  } else if (M.get(node,'type') === S.E_SUB) {
-    res = evaluateSub(resA, resB, pos, scope);
-  } else if (M.get(node,'type') === S.E_MUL) {
-    res = evaluateMul(resA, resB, pos, scope);
-  } else if (M.get(node,'type') === S.E_DIV) {
-    res = evaluateDiv(resA, resB, pos, scope);
-  } else if (M.get(node,'type') === S.E_EQ) {
-    res = evaluateEq(resA, resB, pos, scope);
+  var node_pos = M.get(node, 'pos');
+  var node_type = M.get(node, 'type');
+  if (node_type === S.E_ADD) {
+    res = evaluateAdd(valA, valB, node_pos, scope);
+  } else if (node_type === S.E_SUB) {
+    res = evaluateSub(valA, valB, node_pos, scope);
+  } else if (node_type === S.E_MUL) {
+    res = evaluateMul(valA, valB, node_pos, scope);
+  } else if (node_type === S.E_DIV) {
+    res = evaluateDiv(valA, valB, node_pos, scope);
+  } else if (node_type === S.E_EQ) {
+    res = evaluateEq(valA, valB, node_pos, scope);
+  } else {
+    return makeError("I don't understand the binary operator "+node_type.toString()
+                    , [node], node_pos);
   }
   node._cachedResult = res;
-  if (res.status === 'ERROR') {
-    return res;
-  }
   return res;
 }
 
@@ -149,15 +162,16 @@ var evaluateTerminal = function (node, scope) {
 var evaluateSymbol = function (node, scope) {
   // TODO: Think about optimizing this if it becomes a bottleneck;
   // it has to walk the scope 2x for the sake of avoiding try/catch
-  var name = M.get(node,'name');
-  if (scope.scopeOfSymbol(name) === null) {
-    var e = makeError("I can't find "+name.toString()+" in my scope or parent scopes :("
-                    , [node], M.get(node,'pos'));
+  var node_name = M.get(node,'name');
+  var node_pos = M.get(node,'pos');
+  if (scope.scopeOfSymbol(node_name) === null) {
+    var e = makeError("I can't find "+node_name.toString()+" in my scope or parent scopes :("
+                    , [node], node_pos);
     node._cachedResult = e;
     return e;
   }
-  var s = scope.lookupSymbolValue(name);
-  s = M.assoc(s, 'pos', M.get(node,'pos'));
+  var s = scope.lookupSymbolValue(node_name);
+  s = M.assoc(s, 'pos', node_pos);
   // pos actually doesn't make much sense for values
   // mapped to symbols in the scope contents.
   // However, when we do a symbol lookup, we can set it
@@ -185,18 +199,19 @@ export default function evaluateASTTree (node, scope) {
   if (!node) {
     return;
   }
-  if (M.get(node,'type') === S.S_ASSIGN) {
+  var node_type = M.get(node,'type');
+  if (node_type === S.S_ASSIGN) {
     return evaluateAssign(node, scope);
-  } else if (S.isUnaryOperator(M.get(node,'type'))) {
+  } else if (S.isUnaryOperator(node_type)) {
     return evaluateUnaryOperator(node, scope);
-  } else if (S.isBinaryOperator(M.get(node,'type'))) {
+  } else if (S.isBinaryOperator(node_type)) {
     return evaluateBinaryOperator(node, scope);
-  } else if (M.get(node,'type') === S.T_SYM) { // Needs to be above isTerminal because we don't want to evaluate symbols before lookup
+  } else if (node_type === S.T_SYM) { // Needs to be above isTerminal because we don't want to evaluate symbols before lookup
     return evaluateSymbol(node, scope);
-  } else if (S.isTerminal(M.get(node,'type'))) {
+  } else if (S.isTerminal(node_type)) {
     return evaluateTerminal(node, scope);
   } else {
-    return makeError("I don't understand "+M.get(node,'type').toString()
+    return makeError("I don't understand "+node_type.toString()
                     , [node], M.get(node,'pos'));
     // S.E_CALL
   }
