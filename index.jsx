@@ -1,9 +1,10 @@
 /** @jsx React.DOM */
 'use strict'
 import 'react';
-import Hello from './Hello';
+import StepsView from './StepsView';
+require('./styles/main.scss');
 
 React.render(
-<Hello />,
+<StepsView />,
 document.getElementById('content')
 );

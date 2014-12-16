@@ -1,3 +1,5 @@
+var path = require('path');
+
 module.exports = {
   entry: './index.jsx',
   devtool: 'source-map',
@@ -11,6 +13,11 @@ module.exports = {
     loaders: [
       { test: /\.js$|\.jsx$|\.pegjs$/
       , loader: '6to5-loader'
+      }
+    , {
+        test: /\.scss$/
+        // Query parameters are passed to node-sass
+      , loader: "style!css!sass"
       }
     // , {
     //     //tell webpack to use jsx-loader for all *.jsx files
@@ -30,6 +37,6 @@ module.exports = {
     'react': 'React'
   },
   resolve: {
-    extensions: ['', '.js', '.jsx', '.pegjs']
+    extensions: ['', '.js', '.jsx', '.pegjs', '.scss']
   }
 }
