@@ -18,16 +18,24 @@ require('./styles/button.scss');
 export default React.createClass({
     displayName: 'StepsView'
   , getInitialState: function() {
-    return {steps: [1,2,3]};
+    return {steps: M.vector()};
   }
-  // , handleChange: function (e) {
-  //   this.setState({text: e.target.value});
-  // }
+  , handleClick: function (e) {
+    this.setState({steps: M.conj(this.state.steps, 'x')});
+  }
   , render: function() {
     var steps = this.state.steps;
+    var jsMap = function (f, moriColl) {
+      var res = [];
+      var n = 0;
+      M.each(moriColl, function (x) {res.push(f(x,n)); n+=1;});
+      return res;
+    }
     return <div className='view' style={{width: '10em'}}>
-      {steps.map((x,i) => {return <FrameView/>})}
-      <button className='actionButton'>
+      {jsMap((x,i) => {
+        return <FrameView key={i}/>},steps)
+      }
+      <button className='actionButton' onClick={this.handleClick}>
         +
       </button>
     </div>;
