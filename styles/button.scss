@@ -1,0 +1,27 @@
+@import 'colors';
+
+.actionButton {
+	color: $ui-button-fg-color;
+	background-color: $ui-button-bg-color;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 0.2em;
+	font-size: 2em;
+	width: 1.2em;
+	height: 1.2em;
+	padding: 0 0 0.2em 0;
+	line-height: 1em;
+	justify-content: center;
+	display: flex;
+	border: none;
+	color: #ccc;
+}
+
+.actionButton:active {
+	background-color: $ui-button-clicked-bg-color;
+	color: $ui-button-clicked-fg-color;
+}
+
+.actionButton:focus {
+	outline:0;
+}

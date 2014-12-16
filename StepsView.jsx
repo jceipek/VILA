@@ -8,6 +8,7 @@ import evaluateASTTree from './lang/evaluator';
 import Scope from './lang/scope';
 import FrameView from './FrameView';
 require('./styles/view.scss');
+require('./styles/button.scss');
 
 // var testScope = new Scope();
 
@@ -17,15 +18,18 @@ require('./styles/view.scss');
 export default React.createClass({
     displayName: 'StepsView'
   , getInitialState: function() {
-    return {steps: [1,2,3,4]};
+    return {steps: [1,2,3]};
   }
   // , handleChange: function (e) {
   //   this.setState({text: e.target.value});
   // }
   , render: function() {
     var steps = this.state.steps;
-    return <div className='view'>
+    return <div className='view' style={{width: '10em'}}>
       {steps.map((x,i) => {return <FrameView/>})}
+      <button className='actionButton'>
+        +
+      </button>
     </div>;
   }
 });

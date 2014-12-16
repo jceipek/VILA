@@ -2,5 +2,6 @@
 
 .view {
 	border: 2px solid $ui-border-color;
-	margin: 0.2em;
+	overflow: scroll;
+	flex-direction: column;
 }
