@@ -15,9 +15,11 @@ module.exports = {
       , loader: '6to5-loader'
       }
     , {
-        test: /\.scss$/
+        test: /\.scss$|\.css$/
         // Query parameters are passed to node-sass
-      , loader: "style!css!sass"
+      , loader: "style!css!sass?outputStyle=expanded&" +
+          "includePaths[]=" +
+            (path.resolve(__dirname, "./node_modules"))
       }
     // , {
     //     //tell webpack to use jsx-loader for all *.jsx files
@@ -37,6 +39,6 @@ module.exports = {
     'react': 'React'
   },
   resolve: {
-    extensions: ['', '.js', '.jsx', '.pegjs', '.scss']
+    extensions: ['', '.js', '.jsx', '.pegjs', '.scss', '.css']
   }
 }
