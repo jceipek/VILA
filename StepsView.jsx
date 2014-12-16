@@ -18,7 +18,10 @@ require('./styles/button.scss');
 export default React.createClass({
     displayName: 'StepsView'
   , getInitialState: function() {
-    return {steps: M.vector()};
+    return {steps: M.vector(), selectedIndex: 0};
+  }
+  , changeSelection: function (newIndex) {
+    this.setState({selectedIndex: newIndex});
   }
   , handleClick: function (e) {
     this.setState({steps: M.conj(this.state.steps, 'x')});
@@ -33,7 +36,7 @@ export default React.createClass({
     }
     return <div className='view' style={{width: '10em'}}>
       {jsMap((x,i) => {
-        return <FrameView key={i}/>},steps)
+        return <FrameView key={i} index={i} selected={i === this.state.selectedIndex} onSelect={this.changeSelection}/>},steps)
       }
       <button className='actionButton' onClick={this.handleClick}>
         +

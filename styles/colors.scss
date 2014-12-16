@@ -1,7 +1,10 @@
+$ui-active-blue: #79efff;
+
 $ui-bg-color: #333;
 $ui-layered-fg-color: #aaa;
 $ui-border-color: #eee;
 $ui-button-fg-color: #111;
 $ui-button-clicked-fg-color: #111;
 $ui-button-bg-color: #111;
-$ui-button-clicked-bg-color: #79efff;
+$ui-button-clicked-bg-color: $ui-active-blue;
+$ui-frame-selected-color: $ui-active-blue;

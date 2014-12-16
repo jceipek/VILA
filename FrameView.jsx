@@ -21,8 +21,14 @@ export default React.createClass({
   // , handleChange: function (e) {
   //   this.setState({text: e.target.value});
   // }
-  , render: function() {
-    return <div className='frameContainer'>
+  , handleClick: function () {
+    this.props.onSelect(this.props.index);
+  }
+  , getClasses: function () {
+    return 'frameContainer'+(this.props.selected?' frameContainer--selected':'');
+  }
+  , render: function () {
+    return <div className={this.getClasses()} onClick={this.handleClick}>
     </div>;
   }
 });
