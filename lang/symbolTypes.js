@@ -1,4 +1,6 @@
 import 'es6-symbol/implement';
+var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
+
 var S = {
   S_ASSIGN: Symbol.for('S_ASSIGN')
 , E_CALL: Symbol.for('E_CALL')
@@ -36,71 +38,71 @@ S.isUnaryOperator = function (u) {
 };
 
 S.makeAssignmentStatement = function (sym, expr, pos) {
-  return {
-    type: S.S_ASSIGN
-  , symbol: sym
-  , expr: expr
-  , pos: pos
-  };
+  return M.hash_map(
+    'type', S.S_ASSIGN
+  , 'symbol', sym
+  , 'expr', expr
+  , 'pos', pos
+  );
 };
 
 S.makeSymbol = function (name, pos) {
-  return {
-    type: S.T_SYM
-  , name: name.join('')
-  , pos: pos
-  };
+  return M.hash_map(
+    'type', S.T_SYM
+  , 'name', name.join('')
+  , 'pos', pos
+  );
 };
 
 S.makeCall = function (sym, expr_list, pos) {
-  return {
-    type: S.E_CALL
-  , symbol: sym
-  , exprs: expr_list?expr_list:[]
-  , pos: pos
-  };
+  return M.hash_map(
+    'type', S.E_CALL
+  , 'symbol', sym
+  , 'exprs', expr_list?expr_list:[]
+  , 'pos', pos
+  );
 };
 
 S.makeFloat = function (value, pos) {
-  return {
-    type: S.T_FLOAT
-  , value: value
-  , pos: pos
-  };
+  return M.hash_map(
+    'type', S.T_FLOAT
+  , 'value', value
+  , 'pos', pos
+  );
 };
 
 S.makeInt = function (value, pos) {
-  return {
-    type: S.T_INT
-  , value: value
-  , pos: pos
-  };
+  return M.hash_map(
+    'type', S.T_INT
+  , 'value', value
+  , 'pos', pos
+  );
 };
 
 S.makeBool = function (value, pos) {
-  return {
-    type: S.T_BOOL
-  , value: value
-  , pos: pos
-  };
+  return M.hash_map(
+    'type', S.T_BOOL
+  , 'value', value
+  , 'pos', pos
+  );
 };
 
 S.makeBaseInt = function (strValue, base, pos) {
-  return {
-    type: S.T_BASE_INT
-  , strValue: strValue
-  , base: base
-  , pos: pos
-  };
+  return M.hash_map(
+    'type', S.T_BASE_INT
+  , 'strValue', strValue
+  , 'base', base
+  , 'pos', pos
+  );
 };
 
 var _makeBinaryOp = function (a, b, op, pos) {
-  return {
-    type: op
-  , valueA: a
-  , valueB: b
-  , pos: pos
-  };
+  return M.hash_map(
+    'type', op
+  , 'valueA', a
+  , 'valueB', b
+  , 'pos', pos
+  );
 };
 
 S.makeAdd = function (a, b, pos) {
@@ -124,11 +126,11 @@ S.makeEq = function (a, b, pos) {
 };
 
 S.makeNeg = function (value, pos) {
-  return {
-    type: S.E_NEG
-  , value: value
-  , pos: pos
-  };
+  return M.hash_map(
+    'type', S.E_NEG
+  , 'value', value
+  , 'pos', pos
+  );
 };
 
 export default S;

@@ -20,6 +20,7 @@
   "homepage": "https://github.com/jceipek/VILA",
   "dependencies": {
     "es6-symbol": "^0.1.1",
+    "mori": "^0.2.9",
     "pegjs": "^0.8.0",
     "pegjs-loader": "^0.1.1",
     "react": "^0.12.1"

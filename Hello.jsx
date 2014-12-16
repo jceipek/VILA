@@ -2,6 +2,7 @@
 'use strict';
 import 'react';
 var Parser = require('./lang/parser');
+var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 import S from './lang/symbolTypes';
 import evaluateASTTree from './lang/evaluator';
 import Scope from './lang/scope';
@@ -41,11 +42,11 @@ export default React.createClass({
     var stringifyTitle = function (p) {
       if (p.hasOwnProperty('_cachedResult')) {
         return <span>
-          <h3>{p.type.toString() + " [" + p.pos.col + ", " + p.pos.line + "]"}</h3>
+          <h3>{M.get(p,'type').toString() + " [" + M.get(p,'pos').col + ", " + M.get(p,'pos').line + "]"}</h3>
           <ul><li>{visualizeSimpleEvaluationResponse(p._cachedResult)}</li></ul>
         </span>;
       } else {
-        return <h3>{p.type.toString() + " [" + p.pos.col + ", " + p.pos.line + "]"}</h3>;
+        return <h3>{M.get(p,'type').toString() + " [" + M.get(p,'pos').col + ", " + M.get(p,'pos').line + "]"}</h3>;
       }
     }
 
@@ -53,7 +54,7 @@ export default React.createClass({
       return <span>
         {stringifyTitle(p)}
           <ol>
-            <li>{"name: "+p.name}</li>
+            <li>{"name: "+M.get(p,'name')}</li>
           </ol>
         </span>;
     }
@@ -63,55 +64,55 @@ export default React.createClass({
       return <span>
         {stringifyTitle(p)}
           <ol>
-            <li>{"value: "+JSON.stringify(p.value)+precision}</li>
+            <li>{"value: "+JSON.stringify(M.get(p,'value'))+precision}</li>
           </ol>
         </span>;
     }
 
     var visualizeTree = function (p) {
       if (!p) return "";
-      if (p.type === S.S_ASSIGN) {
+      if (M.get(p,'type') === S.S_ASSIGN) {
         return <span>
               {stringifyTitle(p)}
               <ol>
-                <li>{visualizeTree(p.symbol)}</li>
-                <li>{visualizeTree(p.expr)}</li>
+                <li>{visualizeTree(M.get(p,'symbol'))}</li>
+                <li>{visualizeTree(M.get(p,'expr'))}</li>
               </ol>
             </span>;
       }
-      if (S.isBinaryOperator(p.type)) {
+      if (S.isBinaryOperator(M.get(p,'type'))) {
         return <span>
             {stringifyTitle(p)}
             <ol>
-              <li>{visualizeTree(p.valueA)}</li>
-              <li>{visualizeTree(p.valueB)}</li>
+              <li>{visualizeTree(M.get(p,'valueA'))}</li>
+              <li>{visualizeTree(M.get(p,'valueB'))}</li>
             </ol>
           </span>;
       }
-      if (p.type === S.E_CALL) {
+      if (M.get(p,'type') === S.E_CALL) {
         return <span>
           {stringifyTitle(p)}
             <ol>
-              <li>{visualizeTree(p.symbol)}</li>
+              <li>{visualizeTree(M.get(p,'symbol'))}</li>
               {p.exprs.map((x,i) => { return <li key={i}>{visualizeTree(x)}</li>; })}
             </ol>
         </span>
       }
-      if (p.type === S.E_NEG) {
+      if (M.get(p,'type') === S.E_NEG) {
         return <span>
           {stringifyTitle(p)}
             <ol>
-              <li>{visualizeTree(p.value)}</li>
+              <li>{visualizeTree(M.get(p,'value'))}</li>
             </ol>
         </span>
       }
-      if (p.type === S.T_INT ||
-          p.type === S.T_BOOL ||
-          p.type === S.T_FLOAT ||
-          p.type === S.T_BASE_INT) {
+      if (M.get(p,'type') === S.T_INT ||
+          M.get(p,'type') === S.T_BOOL ||
+          M.get(p,'type') === S.T_FLOAT ||
+          M.get(p,'type') === S.T_BASE_INT) {
           return visualizeBasicTerminal(p);
       }
-      if (p.type === S.T_SYM) {
+      if (M.get(p,'type') === S.T_SYM) {
         return visualizeSymbol(p);
       }
 
