@@ -1,11 +1,6 @@
 @import 'colors';
 
-.frameContainer {
-	height: 5em;
-	margin: 0.5em;
-	background-color: $ui-layered-fg-color;
-}
-
-.frameContainer--selected {
-	border: 2px solid $ui-frame-selected-color;
+.frameView {
+	color: $ui-text-color;
+	padding: 0.5em 2em;
 }

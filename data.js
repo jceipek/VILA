@@ -15,15 +15,6 @@ export class Step {
     this.nextStep = null;
     this.lastStep = null;
   }
-
-  _addStep(s) {
-    this.nextStep = s;
-    s.lastStep = this;
-  }
-
-  addNewStep() {
-    this._addStep(new Step());
-  }
 }
 
 export class Loop extends Step {
@@ -34,7 +25,7 @@ export class Loop extends Step {
 
 export class Frame extends Step {
   constructor () {
-    this.transformation = null;
+    this.transformationCode = "";
   }
 }
 

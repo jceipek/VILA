@@ -1,0 +1,12 @@
+@import 'colors';
+
+.miniFrameContainer {
+	height: 5em;
+	margin: 0.5em;
+	background-color: $ui-layered-fg-color;
+	color: $ui-text-color;
+}
+
+.miniFrameContainer--selected {
+	border: 2px solid $ui-frame-selected-color;
+}

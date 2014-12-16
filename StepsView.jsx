@@ -1,59 +1,46 @@
 /** @jsx React.DOM */
 'use strict';
 import 'react';
+require('./styles/button.scss');
+require('./styles/view.scss');
 var Parser = require('./lang/parser');
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 import S from './lang/symbolTypes';
 import evaluateASTTree from './lang/evaluator';
 import Scope from './lang/scope';
-import FrameView from './FrameView';
+import MiniFrameView from './MiniFrameView';
 import D from './dataManager';
-require('./styles/view.scss');
-require('./styles/button.scss');
-
-
-D.setup();
-// var testScope = new Scope();
-
-// testScope.setSymbolValue('a', S.makeInt(5, null));
-// testScope.setSymbolValue('b', S.makeInt(2, null));
 
 export default React.createClass({
     displayName: 'StepsView'
   , getInitialState: function() {
-    var lastStep = D.getSteps();
-    return {selectedStep: lastStep, lastStep: lastStep, firstStep: lastStep};
+    return {selectedStep: this.props.lastStep, lastStep: this.props.lastStep, firstStep: this.props.firstStep};
   }
   , changeSelection: function (newStep) {
     this.setState({selectedStep: newStep});
+    this.props.changeSelectionHandler(newStep);
   }
   , handleClick: function (e) {
-    this.state.lastStep.addNewStep();
-    this.setState({lastStep: this.state.lastStep.nextStep});
+    var newStep = D.createNewFrameAfterStep(this.state.lastStep);
+    this.setState({lastStep: newStep});
   }
   , render: function() {
-    // var jsMap = function (f, moriColl) {
-    //   var res = [];
-    //   var n = 0;
-    //   M.each(moriColl, function (x) {res.push(f(x,n)); n+=1;});
-    //   return res;
-    // };
     var that = this;
     var selectedStep = this.state.selectedStep;
-    var visualizeStep = function (s,index) {
-      return <FrameView key={index}
-                        step={s}
-                        selected={s === selectedStep}
-                        onSelect={that.changeSelection}/>
+    var visualizeStep = function (step,selectedStep,index,changeSelectionCallback) {
+      return <MiniFrameView key={index}
+                            step={step}
+                            selected={step === selectedStep}
+                            onSelect={changeSelectionCallback}/>
     }
     var visualizeSteps = function (firstStep) {
       var curr = firstStep;
       var res = [];
       var index = 0;
       while (curr != null) {
-        res.push(visualizeStep(curr,index));
+        res.push(visualizeStep(curr, selectedStep, index, that.changeSelection));
         index++;
-        curr = curr.nextStep;
+        curr = D.getStepAfter(curr);
       }
       return res;
     };
