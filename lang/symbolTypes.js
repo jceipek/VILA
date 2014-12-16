@@ -1,20 +1,19 @@
-import 'es6-symbol/implement';
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 
 var S = {
-  S_ASSIGN: Symbol.for('S_ASSIGN')
-, E_CALL: Symbol.for('E_CALL')
-, E_EQ: Symbol.for('E_EQ')
-, E_NEG: Symbol.for('E_NEG')
-, E_ADD: Symbol.for('E_ADD')
-, E_SUB: Symbol.for('E_SUB')
-, E_MUL: Symbol.for('E_MUL')
-, E_DIV: Symbol.for('E_DIV')
-, T_SYM: Symbol.for('T_SYM')
-, T_FLOAT: Symbol.for('T_FLOAT')
-, T_INT: Symbol.for('T_INT')
-, T_BOOL: Symbol.for('T_BOOL')
-, T_BASE_INT: Symbol.for('T_BASE_INT')
+  S_ASSIGN: 'S_ASSIGN'
+, E_CALL: 'E_CALL'
+, E_EQ: 'E_EQ'
+, E_NEG: 'E_NEG'
+, E_ADD: 'E_ADD'
+, E_SUB: 'E_SUB'
+, E_MUL: 'E_MUL'
+, E_DIV: 'E_DIV'
+, T_SYM: 'T_SYM'
+, T_FLOAT: 'T_FLOAT'
+, T_INT: 'T_INT'
+, T_BOOL: 'T_BOOL'
+, T_BASE_INT: 'T_BASE_INT'
 };
 
 S.isTerminal = function (t) {
