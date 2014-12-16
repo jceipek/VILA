@@ -8,21 +8,10 @@ import evaluateASTTree from './lang/evaluator';
 import Scope from './lang/scope';
 require("./styles/frame.scss");
 
-// var testScope = new Scope();
-
-// testScope.setSymbolValue('a', S.makeInt(5, null));
-// testScope.setSymbolValue('b', S.makeInt(2, null));
-
 export default React.createClass({
     displayName: 'FrameView'
-  // , getInitialState: function() {
-  //   return {text: ""};
-  // }
-  // , handleChange: function (e) {
-  //   this.setState({text: e.target.value});
-  // }
   , handleClick: function () {
-    this.props.onSelect(this.props.index);
+    this.props.onSelect(this.props.step);
   }
   , getClasses: function () {
     return 'frameContainer'+(this.props.selected?' frameContainer--selected':'');

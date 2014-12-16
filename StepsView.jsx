@@ -7,9 +7,12 @@ import S from './lang/symbolTypes';
 import evaluateASTTree from './lang/evaluator';
 import Scope from './lang/scope';
 import FrameView from './FrameView';
+import D from './dataManager';
 require('./styles/view.scss');
 require('./styles/button.scss');
 
+
+D.setup();
 // var testScope = new Scope();
 
 // testScope.setSymbolValue('a', S.makeInt(5, null));
@@ -18,26 +21,44 @@ require('./styles/button.scss');
 export default React.createClass({
     displayName: 'StepsView'
   , getInitialState: function() {
-    return {steps: M.vector(), selectedIndex: 0};
+    var lastStep = D.getSteps();
+    return {selectedStep: lastStep, lastStep: lastStep, firstStep: lastStep};
   }
-  , changeSelection: function (newIndex) {
-    this.setState({selectedIndex: newIndex});
+  , changeSelection: function (newStep) {
+    this.setState({selectedStep: newStep});
   }
   , handleClick: function (e) {
-    this.setState({steps: M.conj(this.state.steps, 'x')});
+    this.state.lastStep.addNewStep();
+    this.setState({lastStep: this.state.lastStep.nextStep});
   }
   , render: function() {
-    var steps = this.state.steps;
-    var jsMap = function (f, moriColl) {
-      var res = [];
-      var n = 0;
-      M.each(moriColl, function (x) {res.push(f(x,n)); n+=1;});
-      return res;
+    // var jsMap = function (f, moriColl) {
+    //   var res = [];
+    //   var n = 0;
+    //   M.each(moriColl, function (x) {res.push(f(x,n)); n+=1;});
+    //   return res;
+    // };
+    var that = this;
+    var selectedStep = this.state.selectedStep;
+    var visualizeStep = function (s,index) {
+      return <FrameView key={index}
+                        step={s}
+                        selected={s === selectedStep}
+                        onSelect={that.changeSelection}/>
     }
-    return <div className='view' style={{width: '10em'}}>
-      {jsMap((x,i) => {
-        return <FrameView key={i} index={i} selected={i === this.state.selectedIndex} onSelect={this.changeSelection}/>},steps)
+    var visualizeSteps = function (firstStep) {
+      var curr = firstStep;
+      var res = [];
+      var index = 0;
+      while (curr != null) {
+        res.push(visualizeStep(curr,index));
+        index++;
+        curr = curr.nextStep;
       }
+      return res;
+    };
+    return <div className='view' style={{width: '10em'}}>
+      {visualizeSteps(this.state.firstStep)}
       <button className='actionButton' onClick={this.handleClick}>
         +
       </button>

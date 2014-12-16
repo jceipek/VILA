@@ -1,13 +1,28 @@
 export class Algorithm {
-  constructor () {
-    this.inputData = [];
-    this.steps = [];
+  constructor (firstStep) {
+    this.examples = [];
+    this.steps = firstStep; // This is a doubly linked list
   }
 }
 
+// Steps form a linked list because
+// we want to efficiently add and remove
+// them and an Algorithm hopefully
+// won't require all that many of them
 export class Step {
   constructor () {
     this.inputDataInstances = [];
+    this.nextStep = null;
+    this.lastStep = null;
+  }
+
+  _addStep(s) {
+    this.nextStep = s;
+    s.lastStep = this;
+  }
+
+  addNewStep() {
+    this._addStep(new Step());
   }
 }
 
