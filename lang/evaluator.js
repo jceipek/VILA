@@ -1,4 +1,5 @@
 import S from './symbolTypes';
+import Scope from './scope';
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 
 var makeAssignment = function (sym, r) {
@@ -164,13 +165,13 @@ var evaluateSymbol = function (node, scope) {
   // it has to walk the scope 2x for the sake of avoiding try/catch
   var node_name = M.get(node,'name');
   var node_pos = M.get(node,'pos');
-  if (scope.scopeOfSymbol(node_name) === null) {
+  if (Scope.scopeOfSymbol(scope, node_name) === null) {
     var e = makeError("I can't find "+node_name.toString()+" in my scope or parent scopes :("
                     , [node], node_pos);
     node._cachedResult = e;
     return e;
   }
-  var s = scope.lookupSymbolValue(node_name);
+  var s = Scope.lookupSymbolValue(scope, node_name);
   s = M.assoc(s, 'pos', node_pos);
   // pos actually doesn't make much sense for values
   // mapped to symbols in the scope contents.

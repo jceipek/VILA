@@ -11,6 +11,7 @@ import Scope from './lang/scope';
 import StepsView from './StepsView';
 import FrameView from './FrameView';
 import D from './dataManager';
+import Scope from './lang/scope';
 
 
 export default React.createClass({
@@ -23,6 +24,19 @@ export default React.createClass({
   }
   , handleFrameCodeChange: function (frame, newCodeValue) {
     D.setTransfomationCodeForStep(frame, newCodeValue);
+
+    var parse;
+    try {
+      parse = Parser.parse(newCodeValue);
+      var inputScope = D.getInputScopeForStep(frame);
+      var result = evaluateASTTree(parse, inputScope);
+      if (result.status === 'ASSIGNMENT') {
+        D.setOutputScopeForStep(frame, Scope.mapSymbolToValue(inputScope, frame, M.get(result.symbol,'name'), result.value));
+      }
+    } catch (e) {
+      console.log(JSON.stringify(e));
+    }
+
     this.setState({firstStep:this.state.firstStep}); // XXX: I'm not happy with this solution -JC
   }
   , handleClick: function (e) {

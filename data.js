@@ -11,9 +11,10 @@ export class Algorithm {
 // won't require all that many of them
 export class Step {
   constructor () {
-    this.inputDataInstances = [];
+    this.inputScope = null;
     this.nextStep = null;
     this.lastStep = null;
+    this.outputScope = null;
   }
 }
 

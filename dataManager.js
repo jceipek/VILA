@@ -1,4 +1,5 @@
-import {Algorithm, Frame} from './data'
+import {Algorithm, Frame} from './data';
+import Scope from './lang/scope';
 
 
 // All state of the application should live in here
@@ -14,7 +15,9 @@ var is_ready = false;
 
 export default {
   setup: function () {
-    var alg = new Algorithm(new Frame());
+    var frame = new Frame();
+    frame.inputScope = Scope.makeScope();
+    var alg = new Algorithm(frame);
     applicationState.algorithms.push(alg);
     is_ready = true;
   }
@@ -28,6 +31,7 @@ export default {
     var frame = new Frame();
     step.nextStep = frame;
     frame.lastStep = this;
+    frame.inputScope = step.outputScope;
     return frame;
   }
 , getStepAfter: function (step) {
@@ -51,5 +55,14 @@ export default {
       throw new Error("Trying to set transformation code for non-frame!");
     }
     step.transformationCode = value;
+  }
+, getInputScopeForStep: function (step, scope) {
+    return step.inputScope;
+  }
+, getOutputScopeForStep: function (step, scope) {
+    return step.outputScope;
+  }
+, setOutputScopeForStep: function (step, scope) {
+    step.outputScope = scope;
   }
 }

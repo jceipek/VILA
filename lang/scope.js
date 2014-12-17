@@ -1,61 +1,77 @@
+var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
+
 // NOTE: we currently store the full history of every value in memory
 // It may be prudent to use some form of compression or simplification
 // on the history if we start having memory issues.
-// First, though, it would probably be smarter to store diffs of complex values
-// such as arrays rather than making deep copies every time one of their subvalues
-// changes.
-export default class Scope {
-  constructor () {
-    this.parentScope = null;
-    this.childScopes = [];
-    this.contents = {};
+export default {
+  makeSymbolMap: function (value, originStep) {
+    return M.hash_map(
+      'value', value
+    , 'origin', originStep);
   }
+, makeScope: function (params) {
+    params = params?params:{};
+    var parentScope = params.parentScope?params.parentScope:null;
+    var contents;
+    if (params.lastScope) {
+      M.get(params.lastScope, 'contents');
+    } else {
+      contents = M.hash_map();
+    }
 
-  scopeOfSymbol (symbol) {
-    if (this.contents.hasOwnProperty(symbol)) {
+    return M.hash_map(
+      'parentScope', parentScope
+    , 'contents', contents);
+  }
+, scopeOfSymbol: function (scope, symbol) {
+    if (M.has_key(M.get(scope, 'contents'), symbol)) {
       return 0; // current scope
-    } else if (this.parentScope != null) {
-      return 1+this.parentScope.scopeOfSymbol(symbol); // scope n
+    }
+    var parentScope = M.get(scope, 'parentScope');
+    if (parentScope !== null) {
+      return 1+this.scopeOfSymbol(parentScope, symbol); // scope n
     } else {
       return null; // not available in the scope hierarchy
     }
   }
-
-  lookupSymbolValue (symbol) {
-    if (this.contents.hasOwnProperty(symbol)) {
-      var l = this.contents[symbol].length;
-      if (l === 0) {
-        throw new Error("Symbol " + symbol + " has no value history!");
+, mapSymbolToValue: function (sourceScope, originStep, symbol, value) {
+    var contents = M.get(sourceScope, 'contents');
+    var map = this.makeSymbolMap(value, originStep);
+    contents = M.conj(contents, M.vector(symbol, map));
+    return M.conj(sourceScope, M.vector('contents', contents));
+  }
+, lookupSymbolMap: function (scope, symbol) {
+    var contents = M.get(scope, 'contents');
+    var res = M.get(contents, symbol, null);
+    if (res === null) {
+      var parentScope = M.get(scope, 'parentScope');
+      if (parentScope !== null) {
+        this.lookupSymbolMap (parentScope, symbol);
       } else {
-        return this.contents[symbol][l-1]; // Most recently added value
+        throw new Error("Symbol " + symbol + " doesn't exist!");
       }
-    } else if (this.parentScope != null) {
-      return this.parentScope.lookup(symbol);
     } else {
-      throw new Error("Symbol " + symbol + " doesn't exist!");
+      return res;
     }
   }
-
-  lookupSymbolHistory (symbol) {
-    if (this.contents.hasOwnProperty(symbol)) {
-      return this.contents[symbol];
-    } else {
-      return null;
-    }
+, lookupSymbolValue: function (scope, symbol) {
+    var map = this.lookupSymbolMap(scope, symbol);
+    return M.get(map, 'value');
   }
-
-  setSymbolValue (symbol, value) {
-    if (!this.contents.hasOwnProperty(symbol)) {
-      this.contents[symbol] = [value];
-    } else {
-      this.contents[symbol].push(value);
+, lookupSymbolHistory: function (scope, symbol) {
+    var history = [];
+    var currScope = scope;
+    while (scope !== null) {
+      var contents = M.get(currScope, 'contents');
+      var res = M.get(contents, symbol, null);
+      if (res !== null) {
+        history.push(res);
+      }
+      currScope = M.get(currScope, 'parentScope');
     }
+    return history;
   }
-
-  addNewScope () {
-    var s = new Scope();
-    s.parentScope = this;
-    this.childScopes.push(s);
-    return s;
+, jsOfScope: function (scope) {
+    return M.clj_to_js(scope);
   }
 }

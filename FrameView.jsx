@@ -9,11 +9,12 @@ import S from './lang/symbolTypes';
 import evaluateASTTree from './lang/evaluator';
 import Scope from './lang/scope';
 import D from './dataManager';
+import ScopeView from './ScopeView';
 
-var testScope = new Scope();
+// var testScope = Scope.makeScope();
 
-testScope.setSymbolValue('a', S.makeInt(5, null));
-testScope.setSymbolValue('b', S.makeInt(2, null));
+// testScope = Scope.mapSymbolToValue(testScope, null, 'a', S.makeInt(5, null));
+// testScope = Scope.mapSymbolToValue(testScope, null, 'b', S.makeInt(2, null));
 
 export default React.createClass({
     displayName: 'FrameView'
@@ -22,12 +23,11 @@ export default React.createClass({
   }
   , handleChange: function (e) {
     e.preventDefault();
-    // D.setTransfomationCodeForStep(this.props.step, e.target.value);
-    // this.setState({step: this.props.step});
     this.props.frameChangeHandler(this.props.step, e.target.value);
   }
   , render: function(){
     var text = D.getTransfomationCodeFromStep(this.props.step);
+    var inputScope = D.getInputScopeForStep(this.props.step);
     var parse;
     var result;
     var error = [];
@@ -37,7 +37,7 @@ export default React.createClass({
       error.push(e.message);
     }
 
-    result = evaluateASTTree(parse, testScope);
+    result = evaluateASTTree(parse, inputScope);
 
     var visualizeSimpleEvaluationResponse = function (res) {
       if (res.status === 'ERROR') {
@@ -143,6 +143,7 @@ export default React.createClass({
 
     return (
       <div className='frameView'>
+        <ScopeView scope={D.getInputScopeForStep(this.props.step)} />
         <p>
           <input className='code-box' type="text" placeholder="Expression Here" value={text} onChange={this.handleChange}/>
         </p>
@@ -160,6 +161,7 @@ export default React.createClass({
           Result:<br/>
           {result?visualizeEvaluationResponse(result):""}
         </p>
+        <ScopeView scope={D.getOutputScopeForStep(this.props.step)} />
       </div>
       );
   }
