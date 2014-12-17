@@ -13,40 +13,22 @@ import D from './dataManager';
 
 export default React.createClass({
     displayName: 'StepsView'
-  , getInitialState: function() {
-    return {selectedStep: this.props.lastStep, lastStep: this.props.lastStep, firstStep: this.props.firstStep};
-  }
-  , changeSelection: function (newStep) {
-    this.setState({selectedStep: newStep});
-    this.props.changeSelectionHandler(newStep);
-  }
-  , handleClick: function (e) {
-    var newStep = D.createNewFrameAfterStep(this.state.lastStep);
-    this.setState({lastStep: newStep});
-  }
   , render: function() {
-    var that = this;
-    var selectedStep = this.state.selectedStep;
-    var visualizeStep = function (step,selectedStep,index,changeSelectionCallback) {
+    var visualizeStep = function (step,selectedStepIndex,index,changeSelectionCallback) {
       return <MiniFrameView key={index}
-                            step={step}
-                            selected={step === selectedStep}
-                            onSelect={changeSelectionCallback}/>
+                            inputScope={step.inputScope}
+                            isSelected={step === step.stepIndex}
+                            selectionHandler={changeSelectionCallback.bind(null, step.stepIndex)}
+                            code={step.code}/>
     }
-    var visualizeSteps = function (firstStep) {
-      var curr = firstStep;
-      var res = [];
-      var index = 0;
-      while (curr != null) {
-        res.push(visualizeStep(curr, selectedStep, index, that.changeSelection));
-        index++;
-        curr = D.getStepAfter(curr);
-      }
-      return res;
-    };
     return <div className='view' style={{width: '10em'}}>
-      {visualizeSteps(this.state.firstStep)}
-      <button className='actionButton' onClick={this.handleClick}>
+      {this.props.steps.map((step, i) => {
+        return visualizeStep( step 
+                            , this.props.selectedStepIndex 
+                            , i  
+                            , this.props.changeSelectionHandler)})
+        }
+      <button className='actionButton' onClick={this.props.addNewStepHandler}>
         +
       </button>
     </div>;

@@ -11,15 +11,12 @@ import D from './dataManager';
 
 export default React.createClass({
     displayName: 'MiniFrameView'
-  , handleClick: function () {
-    this.props.onSelect(this.props.step);
-  }
   , getClasses: function () {
-    return 'miniFrameContainer'+(this.props.selected?' miniFrameContainer--selected':'');
+    return 'miniFrameContainer'+(this.props.isSelected?' miniFrameContainer--selected':'');
   }
   , render: function () {
-    return <div className={this.getClasses()} onClick={this.handleClick}>
-    {D.getTransfomationCodeFromStep(this.props.step)}
+    return <div className={this.getClasses()} onClick={this.props.selectionHandler}>
+    {this.props.code}
     </div>;
   }
 });

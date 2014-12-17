@@ -17,17 +17,14 @@ import ScopeView from './ScopeView';
 // testScope = Scope.mapSymbolToValue(testScope, null, 'b', S.makeInt(2, null));
 
 export default React.createClass({
-    displayName: 'FrameView'
-  , getInitialState: function() {
-    return {step: this.props.step};
+  displayName: 'FrameView'
+, codeChanged: function(e){
+    this.props.codeChangedHandler(e.target.value);
   }
-  , handleChange: function (e) {
-    e.preventDefault();
-    this.props.frameChangeHandler(this.props.step, e.target.value);
-  }
-  , render: function(){
-    var text = D.getTransfomationCodeFromStep(this.props.step);
-    var inputScope = D.getInputScopeForStep(this.props.step);
+
+, render: function(){
+    var text = this.props.code;
+    var inputScope = this.props.inputScope;
     var parse;
     var result;
     var error = [];
@@ -143,9 +140,9 @@ export default React.createClass({
 
     return (
       <div className='frameView'>
-        <ScopeView scope={D.getInputScopeForStep(this.props.step)} />
+        <ScopeView scope={this.props.inputScope} />
         <p>
-          <input className='code-box' type="text" placeholder="Expression Here" value={text} onChange={this.handleChange}/>
+          <input className='code-box' type="text" placeholder="Expression Here" value={text} onChange={this.codeChanged}/>
         </p>
         <p>
           AST:
@@ -161,7 +158,7 @@ export default React.createClass({
           Result:<br/>
           {result?visualizeEvaluationResponse(result):""}
         </p>
-        <ScopeView scope={D.getOutputScopeForStep(this.props.step)} />
+        <ScopeView scope={"FIXME"} />
       </div>
       );
   }

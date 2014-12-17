@@ -20,12 +20,14 @@ export class Step {
 
 export class Loop extends Step {
   constructor () {
+    super();
     this.frames = [];
   }
 }
 
 export class Frame extends Step {
   constructor () {
+    super();
     this.transformationCode = "";
   }
 }

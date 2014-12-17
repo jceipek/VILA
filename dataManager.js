@@ -39,18 +39,39 @@ export default {
   }
 , getLastStepInChain: function (step) {
     var curr = step;
-    while (curr.nextStep != null) {
+    while (curr.nextStep !== null) {
       curr = curr.nextStep;
     }
     return curr;
   }
-, getTransfomationCodeFromStep: function (step) {
+, getStepCount: function(firstStep) {
+    var curr = firstStep;
+    var count = 0;
+    while (curr.nextStep !== null) {
+      curr = curr.nextStep;
+      count++;
+    }
+    return count+1;
+}
+, getNthStep: function(firstStep, n){
+    var curr = firstStep;
+    var count = 0;
+    while (curr !== null) {
+      if (count === n){
+        return curr;
+      }
+      curr = curr.nextStep;
+      count++;
+    }
+    throw new Error("Trying to get " + n + " step but there were only " + count + " steps");
+}
+, getTransformationCodeFromStep: function (step) {
     if (!(step instanceof Frame)) {
       throw new Error("Trying to get transformation code for non-frame!");
     }
     return step.transformationCode;
   }
-, setTransfomationCodeForStep: function (step, value) {
+, setTransformationCodeForStep: function (step, value) {
     if (!(step instanceof Frame)) {
       throw new Error("Trying to set transformation code for non-frame!");
     }
