@@ -35,10 +35,8 @@ export default {
     }
   }
 , mapSymbolToValue: function (sourceScope, originStep, symbol, value) {
-    var contents = M.get(sourceScope, 'contents');
     var map = this.makeSymbolMap(value, originStep);
-    contents = M.conj(contents, M.vector(symbol, map));
-    return M.conj(sourceScope, M.vector('contents', contents));
+    return M.assoc_in(sourceScope, ['contents', symbol], map);
   }
 , lookupSymbolMap: function (scope, symbol) {
     var contents = M.get(scope, 'contents');

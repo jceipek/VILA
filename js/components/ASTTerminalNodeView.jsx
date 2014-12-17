@@ -2,9 +2,9 @@
 'use strict';
 import 'react';
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
-import Scope from './lang/scope';
-import S from './lang/symbolTypes';
-import D from './dataManager';
+import Scope from 'lang/scope';
+import S from 'lang/symbolTypes';
+import D from 'dataManager';
 
 // import EvaluationResponseView from './EvaluationResponseView';
 

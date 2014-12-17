@@ -1,21 +1,23 @@
 /** @jsx React.DOM */
 'use strict';
 import 'react';
-require('./styles/button.scss');
-require('./styles/view.scss');
-var Parser = require('./lang/parser');
+require('styles/button.scss');
+require('styles/view.scss');
+var Parser = require('lang/parser');
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
-import evaluateASTTree from './lang/evaluator';
-import Scope from './lang/scope';
-import StepsView from './StepsView';
-import FrameView from './FrameView';
-import D from './dataManager';
-import Scope from './lang/scope';
+import evaluateASTTree from 'lang/evaluator';
+import Scope from 'lang/scope';
+import StepsView from 'components/StepsView';
+import FrameView from 'components/FrameView';
+import D from 'dataManager';
+import Scope from 'lang/scope';
 
 export default React.createClass({
     displayName: 'BaseView'
   , getInitialState: function() {
-    return {selectedStepIndex: (D.getStepCount(this.props.firstStep) - 1), lastStep: this.props.lastStep, firstStep: this.props.firstStep};
+    return { selectedStepIndex: (D.getStepCount(this.props.firstStep) - 1)
+           , lastStep: this.props.lastStep
+           , firstStep: this.props.firstStep};
   }
   , changeSelection: function (newStepIndex) {
     this.setState({selectedStepIndex: newStepIndex});

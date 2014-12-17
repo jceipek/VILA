@@ -1,5 +1,5 @@
-import S from './symbolTypes';
-import Scope from './scope';
+import S from 'lang/symbolTypes';
+import Scope from 'lang/scope';
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 
 var makeAssignment = function (sym, r) {

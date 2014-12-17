@@ -1,17 +1,17 @@
 /** @jsx React.DOM */
 'use strict';
 import 'react';
-require("./styles/frame.scss");
-require("./styles/code.scss");
-var Parser = require('./lang/parser');
+require("styles/frame.scss");
+require("styles/code.scss");
+var Parser = require('lang/parser');
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
-import S from './lang/symbolTypes';
-import evaluateASTTree from './lang/evaluator';
-import Scope from './lang/scope';
-import D from './dataManager';
-import ScopeView from './ScopeView';
-import ASTView from './ASTView';
-import EvaluationResponseView from './EvaluationResponseView';
+import S from 'lang/symbolTypes';
+import evaluateASTTree from 'lang/evaluator';
+import Scope from 'lang/scope';
+import D from 'dataManager';
+import ScopeView from 'components/ScopeView';
+import ASTView from 'components/ASTView';
+import EvaluationResponseView from 'components/EvaluationResponseView';
 
 export default React.createClass({
   displayName: 'FrameView'

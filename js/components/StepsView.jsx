@@ -1,15 +1,15 @@
 /** @jsx React.DOM */
 'use strict';
 import 'react';
-require('./styles/button.scss');
-require('./styles/view.scss');
-var Parser = require('./lang/parser');
+require('styles/button.scss');
+require('styles/view.scss');
+var Parser = require('lang/parser');
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
-import S from './lang/symbolTypes';
-import evaluateASTTree from './lang/evaluator';
-import Scope from './lang/scope';
-import MiniFrameView from './MiniFrameView';
-import D from './dataManager';
+import S from 'lang/symbolTypes';
+import evaluateASTTree from 'lang/evaluator';
+import Scope from 'lang/scope';
+import MiniFrameView from 'components/MiniFrameView';
+import D from 'dataManager';
 
 export default React.createClass({
     displayName: 'StepsView'

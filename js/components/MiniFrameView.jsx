@@ -1,13 +1,13 @@
 /** @jsx React.DOM */
 'use strict';
 import 'react';
-require("./styles/miniFrame.scss");
-var Parser = require('./lang/parser');
+require("styles/miniFrame.scss");
+var Parser = require('lang/parser');
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
-import S from './lang/symbolTypes';
-import evaluateASTTree from './lang/evaluator';
-import Scope from './lang/scope';
-import D from './dataManager';
+import S from 'lang/symbolTypes';
+import evaluateASTTree from 'lang/evaluator';
+import Scope from 'lang/scope';
+import D from 'dataManager';
 
 export default React.createClass({
     displayName: 'MiniFrameView'

@@ -2,8 +2,8 @@
 'use strict';
 import 'react';
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
-import Scope from './lang/scope';
-import D from './dataManager';
+import Scope from 'lang/scope';
+import D from 'dataManager';
 import ASTTerminalNodeView from './ASTTerminalNodeView'
 
 export default React.createClass({

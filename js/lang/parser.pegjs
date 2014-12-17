@@ -1,5 +1,5 @@
 {
-  import S from './symbolTypes';
+  import S from 'lang/symbolTypes';
   function getPos(col, line) {
     return {line: line, col: col};
   }

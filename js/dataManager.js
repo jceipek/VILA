@@ -1,8 +1,8 @@
 import {Algorithm, Frame} from './data';
-import Scope from './lang/scope';
-var Parser = require('./lang/parser');
-import evaluateASTTree from './lang/evaluator';
-import S from './lang/symbolTypes';
+import Scope from 'lang/scope';
+var Parser = require('lang/parser');
+import evaluateASTTree from 'lang/evaluator';
+import S from 'lang/symbolTypes';
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 
 // All state of the application should live in here
