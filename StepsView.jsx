@@ -17,15 +17,16 @@ export default React.createClass({
     var visualizeStep = function (step,selectedStepIndex,index,changeSelectionCallback) {
       return <MiniFrameView key={index}
                             inputScope={step.inputScope}
-                            isSelected={step === step.stepIndex}
+                            index={step.stepIndex}
+                            isSelected={selectedStepIndex === step.stepIndex}
                             selectionHandler={changeSelectionCallback.bind(null, step.stepIndex)}
                             code={step.code}/>
     }
     return <div className='view' style={{width: '10em'}}>
       {this.props.steps.map((step, i) => {
-        return visualizeStep( step 
-                            , this.props.selectedStepIndex 
-                            , i  
+        return visualizeStep( step
+                            , this.props.selectedStepIndex
+                            , i
                             , this.props.changeSelectionHandler)})
         }
       <button className='actionButton' onClick={this.props.addNewStepHandler}>

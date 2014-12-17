@@ -1,6 +1,9 @@
 import {Algorithm, Frame} from './data';
 import Scope from './lang/scope';
-
+var Parser = require('./lang/parser');
+import evaluateASTTree from './lang/evaluator';
+import S from './lang/symbolTypes';
+var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 
 // All state of the application should live in here
 // so we can easily serialize and desirialize it later
@@ -31,7 +34,7 @@ export default {
     var frame = new Frame();
     step.nextStep = frame;
     frame.lastStep = this;
-    frame.inputScope = step.outputScope;
+    frame.inputScope = this.newScopeFromScopeAndFrame(step.inputScope, step);
     return frame;
   }
 , getStepAfter: function (step) {
@@ -85,5 +88,18 @@ export default {
   }
 , setOutputScopeForStep: function (step, scope) {
     step.outputScope = scope;
+  }
+, newScopeFromScopeAndFrame: function (scope, frame) {
+    var newScope = scope;
+    try {
+      var parse = Parser.parse(frame.transformationCode);
+      var result = evaluateASTTree(parse, scope);
+      if (result.status === 'ASSIGNMENT') {
+        newScope = Scope.mapSymbolToValue(scope, frame, M.get(result.symbol, 'name'), result.value);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+    return newScope;
   }
 }

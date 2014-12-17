@@ -17,6 +17,7 @@ export default React.createClass({
   , render: function () {
     return <div className={this.getClasses()} onClick={this.props.selectionHandler}>
     {this.props.code}
+    <span className='miniFrameIndex'>{this.props.index}</span>
     </div>;
   }
 });

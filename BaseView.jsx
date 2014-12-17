@@ -5,14 +5,12 @@ require('./styles/button.scss');
 require('./styles/view.scss');
 var Parser = require('./lang/parser');
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
-import S from './lang/symbolTypes';
 import evaluateASTTree from './lang/evaluator';
 import Scope from './lang/scope';
 import StepsView from './StepsView';
 import FrameView from './FrameView';
 import D from './dataManager';
 import Scope from './lang/scope';
-
 
 export default React.createClass({
     displayName: 'BaseView'
@@ -28,19 +26,6 @@ export default React.createClass({
   }
   , handleFrameCodeChange: function (frame, newCodeValue) {
     D.setTransformationCodeForStep(frame, newCodeValue);
-/*
-    var parse;
-    try {
-      parse = Parser.parse(newCodeValue);
-      var inputScope = D.getInputScopeForStep(frame);
-      var result = evaluateASTTree(parse, inputScope);
-      if (result.status === 'ASSIGNMENT') {
-        
-      }
-    } catch (e) {
-      console.log(JSON.stringify(e));
-    }
-*/
     this.setState({firstStep:this.state.firstStep}); // XXX: I'm not happy with this solution -JC
   }
   , makeFakeStep: function(lastStep, step, stepIndex){
@@ -52,18 +37,7 @@ export default React.createClass({
         };
       }
       var inputScope = D.getInputScopeForStep(lastStep);
-      var lastCode = D.getTransformationCodeFromStep(lastStep);
-      var lastInputScope = D.getInputScopeForStep(lastStep);
-      var parse;
-      try {
-        parse = Parser.parse(lastCode);
-        var result = evaluateASTTree(parse, lastInputScope);
-        if (result.status === 'ASSIGNMENT') {
-          inputScope = Scope.mapSymbolToValue(lastInputScope, lastStep, M.get(result.symbol, 'name'), result.value)
-        }
-      } catch (e) {
-        console.log(JSON.stringify(e));
-      }
+      inputScope = D.newScopeFromScopeAndFrame(inputScope, lastStep);
       return {
         code: D.getTransformationCodeFromStep(step)
       , inputScope: inputScope
