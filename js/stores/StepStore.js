@@ -3,7 +3,6 @@ var Reflux = require('reflux');
 import StepActions from 'actions/StepActions';
 import Scope from 'lang/scope';
 
-var _steps = [];
 
 // TODO: Think about a different way to construct ids?
 var _nextId = 0;
@@ -19,6 +18,8 @@ var _makeFrame = function (inputScope, codeStr) {
   , code: codeStr
   };
 };
+
+var _steps = [_makeFrame(Scope.makeScope(),"1+2")];
 
 var _findFrameIndex = function (id) {
   for (var i = 0; i < _steps.length; i++) {
@@ -63,7 +64,8 @@ export default Reflux.createStore({
   }
   // This will be called by all listening components
   // as they register their listeners
-, getDefaultData: function() {
+, getInitialState: function() {
+    console.log("DEFAULT DATA");
     return _steps;
   }
 });

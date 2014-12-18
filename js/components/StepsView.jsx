@@ -3,33 +3,43 @@
 import 'react';
 require('styles/button.scss');
 require('styles/view.scss');
-var Parser = require('lang/parser');
-var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
-import S from 'lang/symbolTypes';
-import evaluateASTTree from 'lang/evaluator';
-import Scope from 'lang/scope';
+
 import MiniFrameView from 'components/MiniFrameView';
-import D from 'dataManager';
+
+import StepActions from 'actions/StepActions';
 
 export default React.createClass({
     displayName: 'StepsView'
-  , render: function() {
-    var visualizeStep = function (step,selectedStepIndex,index,changeSelectionCallback) {
-      return <MiniFrameView key={index}
-                            inputScope={step.inputScope}
-                            index={step.stepIndex}
-                            isSelected={selectedStepIndex === step.stepIndex}
-                            selectionHandler={changeSelectionCallback.bind(null, step.stepIndex)}
-                            code={step.code}/>
+  , propTypes: {
+      steps: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
+    , selectedStepId: React.PropTypes.number // can be null
+    , changeSelectionHandler: React.PropTypes.func.isRequired
+  }
+  , addNewStepAtEnd: function(){ // TODO: Make this add a step at other places based on UI input
+    var id = null;
+    var stepCount = this.props.steps.length;
+    if (stepCount > 0) {
+      id = this.props.steps[stepCount-1].id;
     }
+    StepActions.addStep(id);
+  }
+  , visualizeStep: function (step,selectedStepId,changeSelectionCallback) {
+      return <MiniFrameView key={step.id}
+                            step={step}
+                            isSelected={step.id===selectedStepId}
+                            selectionHandler={changeSelectionCallback.bind(null, step)}/>
+    }
+  , render: function() {
     return <div className='view' style={{width: '10em'}}>
-      {this.props.steps.map((step, i) => {
-        return visualizeStep( step
-                            , this.props.selectedStepIndex
-                            , i
-                            , this.props.changeSelectionHandler)})
-        }
-      <button className='actionButton' onClick={this.props.addNewStepHandler}>
+      {this.props.steps.map((step, i) =>
+        {
+        return <MiniFrameView key={step.id}
+                              step={step}
+                              index={i}
+                              isSelected={step.id===this.props.selectedStepId}
+                              selectionHandler={this.props.changeSelectionHandler.bind(null, step)}/>;
+        })}
+      <button className='actionButton' onClick={this.addNewStepAtEnd}>
         +
       </button>
     </div>;
