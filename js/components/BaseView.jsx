@@ -11,14 +11,29 @@ import StepsView from 'components/StepsView';
 import FrameView from 'components/FrameView';
 import D from 'dataManager';
 import Scope from 'lang/scope';
+import StepActions from 'actions/StepActions';
+import StepStore from 'stores/StepStore';
 
 export default React.createClass({
     displayName: 'BaseView'
   , getInitialState: function() {
-    return { selectedStepIndex: (D.getStepCount(this.props.firstStep) - 1)
-           , lastStep: this.props.lastStep
-           , firstStep: this.props.firstStep};
+    return {data: []};
+    // return { selectedStepIndex: (D.getStepCount(this.props.firstStep) - 1)
+    //        , lastStep: this.props.lastStep
+    //        , firstStep: this.props.firstStep};
   }
+  , onStatusChange: function(status) {
+    this.setState({
+        data: status
+    });
+    }
+  , componentDidMount: function() {
+    StepActions.getSteps();
+    this.unsubscribe = StepStore.listen(this.onStatusChange);
+    }
+  , componentWillUnmount: function() {
+    this.unsubscribe();
+    }
   , changeSelection: function (newStepIndex) {
     this.setState({selectedStepIndex: newStepIndex});
   }
@@ -58,15 +73,16 @@ export default React.createClass({
       return steps;
   }
   , render: function() {
-    var fakeSteps = this.getSteps();
-    return <div className='wrapper'>
-            <StepsView steps={fakeSteps}
-                       selectedStepIndex={this.state.selectedStepIndex}
-                       changeSelectionHandler={this.changeSelection}
-                       addNewStepHandler={this.addNewStep}/>
-            <FrameView inputScope={fakeSteps[this.state.selectedStepIndex].inputScope}
-                       code={fakeSteps[this.state.selectedStepIndex].code}
-                       codeChangedHandler={this.handleFrameCodeChange.bind(null, D.getNthStep(this.state.firstStep, this.state.selectedStepIndex))}/>
-          </div>;
+    return <span style={{color: 'red'}} onClick={StepActions.addStep}>{JSON.stringify(this.state.data)}</span>
+    // var fakeSteps = this.getSteps();
+    // return <div className='wrapper'>
+    //         <StepsView steps={fakeSteps}
+    //                    selectedStepIndex={this.state.selectedStepIndex}
+    //                    changeSelectionHandler={this.changeSelection}
+    //                    addNewStepHandler={this.addNewStep}/>
+    //         <FrameView inputScope={fakeSteps[this.state.selectedStepIndex].inputScope}
+    //                    code={fakeSteps[this.state.selectedStepIndex].code}
+    //                    codeChangedHandler={this.handleFrameCodeChange.bind(null, D.getNthStep(this.state.firstStep, this.state.selectedStepIndex))}/>
+    //       </div>;
   }
 });

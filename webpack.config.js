@@ -1,7 +1,7 @@
 var path = require('path');
 
 module.exports = {
-  entry: './js/index.jsx',
+  entry: './js/app.jsx',
   devtool: 'source-map',
   output: {
     filename: 'bundle.js' //this is the default name, so you can skip it
@@ -41,7 +41,19 @@ module.exports = {
   },
   resolve: {
     root: [__dirname]
-  , modulesDirectories: ['node_modules', 'styles', 'js', 'components','lang']
-  , extensions: ['', '.js', '.jsx', '.pegjs', '.scss', '.css']
+  , modulesDirectories: [ 'node_modules'
+                        , 'styles'
+                        , 'js'
+                        , 'components'
+                        ,'lang'
+                        , 'dispatcher'
+                        , 'constants'
+                        , 'stores']
+  , extensions: [''
+                , '.js'
+                , '.jsx'
+                , '.pegjs'
+                , '.scss'
+                , '.css']
   }
 }
