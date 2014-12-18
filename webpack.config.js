@@ -1,13 +1,14 @@
 var path = require('path');
 
 module.exports = {
-  entry: './index.jsx',
+  entry: './js/app.jsx',
   devtool: 'source-map',
   output: {
-    filename: 'bundle.js', //this is the default name, so you can skip it
+    filename: 'bundle.js' //this is the default name, so you can skip it
+  , path: __dirname + '/js'
     //at this directory our bundle file will be available
     //make sure port 8090 is used when launching webpack-dev-server
-    publicPath: 'http://localhost:8090/assets'
+  , publicPath: 'http://localhost:8090/assets'
   },
   module: {
     loaders: [
@@ -39,6 +40,20 @@ module.exports = {
     'react': 'React'
   },
   resolve: {
-    extensions: ['', '.js', '.jsx', '.pegjs', '.scss', '.css']
+    root: [__dirname]
+  , modulesDirectories: [ 'node_modules'
+                        , 'styles'
+                        , 'js'
+                        , 'components'
+                        ,'lang'
+                        , 'dispatcher'
+                        , 'constants'
+                        , 'stores']
+  , extensions: [''
+                , '.js'
+                , '.jsx'
+                , '.pegjs'
+                , '.scss'
+                , '.css']
   }
 }

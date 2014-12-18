@@ -10,3 +10,10 @@
 .miniFrameContainer--selected {
 	border: 2px solid $ui-frame-selected-color;
 }
+
+.miniFrameIndex {
+	float: right;
+	font-size: 0.7em;
+	margin: 0.2em 0.4em;
+	color: $ui-low-importance-text-color;
+}
