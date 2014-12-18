@@ -3,15 +3,31 @@
 .miniFrameContainer {
 	height: 5em;
 	margin: 0.5em;
-	background-color: $ui-layered-fg-color;
+	background-color: $ui-layered-bg-color;
 	color: $ui-text-color;
 	position: relative;
 
-	border: 2px solid $ui-layered-fg-color;
+	border: 2px solid $ui-layered-bg-color;
 }
 
 .miniFrameContainer--selected {
 	border: 2px solid $ui-frame-selected-color;
+}
+
+.miniFrameContainer--empty {
+	background-color: $ui-layered-bg-color;
+}
+
+.miniFrameContainer--assignment {
+	background-color: $ui-layered-bg-color-assignment;
+}
+
+.miniFrameContainer--expression {
+	background-color: $ui-layered-bg-color-expression;
+}
+
+.miniFrameContainer--error {
+	background-color: $ui-layered-bg-color-error;
 }
 
 .miniFrameIndex {

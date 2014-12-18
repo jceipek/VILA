@@ -17,6 +17,10 @@ export default React.createClass({
     var classes = cx({
       'miniFrameContainer': true
     , 'miniFrameContainer--selected': this.props.isSelected
+    , 'miniFrameContainer--error': this.props.step.status==='ERROR'
+    , 'miniFrameContainer--empty': this.props.step.status==='EMPTY'
+    , 'miniFrameContainer--assignment': this.props.step.status==='ASSIGNMENT'
+    , 'miniFrameContainer--expression': this.props.step.status==='EXPRESSION'
     });
     return <div className={classes}
                 onClick={this.props.selectionHandler}>
