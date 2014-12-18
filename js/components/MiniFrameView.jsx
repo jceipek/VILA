@@ -2,6 +2,7 @@
 'use strict';
 import 'react';
 require("styles/miniFrame.scss");
+import MiniScopeView from 'components/MiniScopeView';
 
 export default React.createClass({
     displayName: 'MiniFrameView'
@@ -11,13 +12,16 @@ export default React.createClass({
     , index: React.PropTypes.number.isRequired
     , selectionHandler: React.PropTypes.func.isRequired
   }
-  , getClasses: function () {
-    return 'miniFrameContainer'+(this.props.isSelected?' miniFrameContainer--selected':'');
-  }
   , render: function () {
-    return <div className={this.getClasses()}
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'miniFrameContainer': true
+    , 'miniFrameContainer--selected': this.props.isSelected
+    });
+    return <div className={classes}
                 onClick={this.props.selectionHandler}>
-                {this.props.step.code}
+              <MiniScopeView scope={this.props.step.inputScope} />
+              <span className='miniFrameCode'>{this.props.step.code}</span>
               <span className='miniFrameIndex'>{this.props.index}</span>
            </div>;
   }

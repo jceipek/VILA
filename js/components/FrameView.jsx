@@ -11,6 +11,7 @@ var Parser = require('lang/parser');
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 import evaluateASTTree from 'lang/evaluator';
 import StepActions from 'actions/StepActions';
+import Scope from 'lang/scope';
 
 export default React.createClass({
   displayName: 'FrameView'

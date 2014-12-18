@@ -5,6 +5,9 @@
 	margin: 0.5em;
 	background-color: $ui-layered-fg-color;
 	color: $ui-text-color;
+	position: relative;
+
+	border: 2px solid $ui-layered-fg-color;
 }
 
 .miniFrameContainer--selected {
@@ -12,8 +15,18 @@
 }
 
 .miniFrameIndex {
-	float: right;
 	font-size: 0.7em;
 	margin: 0.2em 0.4em;
 	color: $ui-low-importance-text-color;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.miniFrameCode {
+	color: $ui-low-importance-text-color;
+	position: absolute;
+	bottom: 0.2em;
+	width: 100%;
+	text-align: center;
 }

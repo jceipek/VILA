@@ -35,6 +35,9 @@ var _findFrameIndex = function (id) {
 
 var _outputScopeFromFrame = function (frame) {
   var newScope = frame.inputScope;
+  if (frame.code === "") {
+    return newScope;
+  }
   try {
     var parse = Parser.parse(frame.code);
     var result = evaluateASTTree(parse, frame.inputScope);
@@ -42,7 +45,8 @@ var _outputScopeFromFrame = function (frame) {
       newScope = Scope.mapSymbolToValue(frame.inputScope, frame, M.get(result.symbol, 'name'), result.value);
     }
   } catch (e) {
-    console.log(e);
+    return frame.inputScope; //XXX: TODO: Mark scope as invalid to alert programmer
+    //console.log(e);
   }
   return newScope;
 };
