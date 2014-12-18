@@ -13,13 +13,14 @@ import StepActions from 'actions/StepActions';
 // }
 
 var _steps = [];
+var _selectedStep = null;
 
 export default Reflux.createStore({
   listenables: StepActions
 , onAddStep: function () {
     console.log('ADD STEP FIRED');
     _steps.push(Math.floor(Math.random()*10));
-    this.trigger(_steps);
+    this.updateSteps(_steps);
   }
 , onUpdateStep: function () {
     console.log('UPDATE STEP FIRED');
@@ -27,8 +28,15 @@ export default Reflux.createStore({
 , onRemoveStep: function () {
     console.log('REMOVE STEP FIRED');
   }
-, onGetSteps: function () {
-    console.log('GET STEPS');
-    this.trigger(_steps);
+  // called whenever we change a list. normally this would mean a database API call
+, updateSteps: function (steps) {
+    // if we used a real database, we would likely do the below in a callback
+    _steps = steps;
+    this.trigger(_steps); // sends the updated list to all listening components
+  }
+  // this will be called by all listening components
+  // as they register their listeners
+, getDefaultData: function() {
+    return _steps;
   }
 });

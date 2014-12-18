@@ -17,18 +17,17 @@ import StepStore from 'stores/StepStore';
 export default React.createClass({
     displayName: 'BaseView'
   , getInitialState: function() {
-    return {data: []};
+    return {steps: []};
     // return { selectedStepIndex: (D.getStepCount(this.props.firstStep) - 1)
     //        , lastStep: this.props.lastStep
     //        , firstStep: this.props.firstStep};
   }
-  , onStatusChange: function(status) {
+  , onStatusChange: function(steps) {
     this.setState({
-        data: status
+        steps: steps
     });
     }
   , componentDidMount: function() {
-    StepActions.getSteps();
     this.unsubscribe = StepStore.listen(this.onStatusChange);
     }
   , componentWillUnmount: function() {
@@ -73,7 +72,7 @@ export default React.createClass({
       return steps;
   }
   , render: function() {
-    return <span style={{color: 'red'}} onClick={StepActions.addStep}>{JSON.stringify(this.state.data)}</span>
+    return <span style={{color: 'red'}} onClick={StepActions.addStep}>{JSON.stringify(this.state.steps)}</span>
     // var fakeSteps = this.getSteps();
     // return <div className='wrapper'>
     //         <StepsView steps={fakeSteps}

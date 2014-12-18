@@ -10,5 +10,4 @@ export default Reflux.createActions(
   'addStep'
 , 'updateStep'
 , 'removeStep'
-, 'getSteps'
 ]);
