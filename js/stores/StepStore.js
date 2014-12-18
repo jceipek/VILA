@@ -12,16 +12,17 @@ var _getNewId = function () {
   return (_nextId++); // Add after returning old value
 };
 
-var _makeFrame = function (inputScope, codeStr) {
+var _makeFrame = function (inputScope, codeStr, status) {
   return {
     type: 'FRAME'
   , id: _getNewId()
   , inputScope: inputScope
   , code: codeStr
+  , status: status
   };
 };
 
-var _steps = [_makeFrame(Scope.makeScope(),"1+2")];
+var _steps = [_makeFrame(Scope.makeScope(),"1+2",'EXPRESSION')];
 
 // TODO: optimize here when things slow down (this is called every time code changes)
 var _findFrameIndex = function (id) {
@@ -33,22 +34,30 @@ var _findFrameIndex = function (id) {
   throw new Error("CAN'T FIND FRAME WITH INDEX: "+id);
 };
 
-var _outputScopeFromFrame = function (frame) {
+// XXX: TODO: Clean this up; it's pretty confusing
+var _outputScopeFromFrameWithResponse = function (frame) {
   var newScope = frame.inputScope;
   if (frame.code === "") {
-    return newScope;
+    return {status:'EMPTY', scope: newScope};
   }
+  var result;
   try {
     var parse = Parser.parse(frame.code);
-    var result = evaluateASTTree(parse, frame.inputScope);
+    result = evaluateASTTree(parse, frame.inputScope);
     if (result.status === 'ASSIGNMENT') {
       newScope = Scope.mapSymbolToValue(frame.inputScope, frame, M.get(result.symbol, 'name'), result.value);
     }
   } catch (e) {
-    return frame.inputScope; //XXX: TODO: Mark scope as invalid to alert programmer
-    //console.log(e);
+    return {status:'ERROR', scope:frame.inputScope};
   }
-  return newScope;
+
+  if (result.status === 'ASSIGNMENT') {
+    return {status:'ASSIGNMENT', scope:newScope};
+  } else if (result.status === 'ERROR') {
+    return {status:'ERROR', scope:frame.inputScope}; // Lexing error
+  } else {
+    return {status:'EXPRESSION', scope:newScope};
+  }
 };
 
 export default Reflux.createStore({
@@ -59,10 +68,13 @@ export default Reflux.createStore({
       _steps.push(_makeFrame(Scope.makeScope(),""));
     } else {
       var lastIndex = _findFrameIndex(lastId);
-      var outputScope = _outputScopeFromFrame(_steps[lastIndex])
+      var outputScopeResponse = _outputScopeFromFrameWithResponse(_steps[lastIndex])
+      _steps[lastIndex].status = outputScopeResponse.status;
+      var outputScope = outputScopeResponse.scope;
+      var newFrame = _makeFrame(outputScope,"");
       _steps.splice(lastIndex+1
                    , 0 // Remove 0 items.
-                   , _makeFrame(outputScope,""));
+                   , newFrame);
     }
     this.updateSteps(_steps);
   }
@@ -70,8 +82,15 @@ export default Reflux.createStore({
     console.log('UPDATE STEP FIRED');
     var index = _findFrameIndex(id);
     _steps[index].code = code;
+    if (index === _steps.length - 1) {
+      var outputScopeResponse = _outputScopeFromFrameWithResponse(_steps[index]);
+      _steps[index].status = outputScopeResponse.status;
+    }
     while (index+1 < _steps.length) {
-      _steps[index+1].inputScope = _outputScopeFromFrame(_steps[index]);
+      var outputScopeResponse = _outputScopeFromFrameWithResponse(_steps[index]);
+      var outputScope = outputScopeResponse.scope;
+      _steps[index].status = outputScopeResponse.status;
+      _steps[index+1].inputScope = outputScope;
       index++;
     }
     this.updateSteps(_steps);
