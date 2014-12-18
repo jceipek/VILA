@@ -6,7 +6,6 @@ import evaluateASTTree from 'lang/evaluator';
 var Parser = require('lang/parser');
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 
-
 // TODO: Think about a different way to construct ids?
 var _nextId = 0;
 var _getNewId = function () {
@@ -24,11 +23,7 @@ var _makeFrame = function (inputScope, codeStr) {
 
 var _steps = [_makeFrame(Scope.makeScope(),"1+2")];
 
-window.getSteps = function () {
-  return _steps.map((s) => {return M.clj_to_js(s.inputScope)});
-}
-
-
+// TODO: optimize here when things slow down (this is called every time code changes)
 var _findFrameIndex = function (id) {
   for (var i = 0; i < _steps.length; i++) {
     if (_steps[i].id === id) {
@@ -87,7 +82,7 @@ export default Reflux.createStore({
     _steps = steps;
     this.trigger(_steps); // Sends the updated steps to all listening components
   }
-  // This will be called by all listening components
+  // This should be called by all listening components
   // as they register their listeners
 , getInitialState: function() {
     console.log("DEFAULT DATA");

@@ -11,11 +11,6 @@ import StepsView from 'components/StepsView';
 import FrameView from 'components/FrameView';
 require('styles/view.scss');
 
-var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
-import evaluateASTTree from 'lang/evaluator';
-import Scope from 'lang/scope';
-var Parser = require('lang/parser');
-
 export default React.createClass({
   displayName: 'BaseView'
 , getInitialState: function() {

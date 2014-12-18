@@ -1,13 +1,11 @@
 /** @jsx React.DOM */
 'use strict';
 import 'react';
-var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
-import Scope from 'lang/scope';
-import S from 'lang/symbolTypes';
-import D from 'dataManager';
 import ASTTerminalNodeView from './ASTTerminalNodeView';
-
 import EvaluationResponseView from './EvaluationResponseView';
+
+var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
+import S from 'lang/symbolTypes';
 
 export default React.createClass({
   displayName: 'ASTView'
