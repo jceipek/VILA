@@ -1,23 +1,28 @@
 /** @jsx React.DOM */
 'use strict';
+
+// Reflux
+import StepActions from 'actions/StepActions';
+import StepStore from 'stores/StepStore';
+
+// React
 import 'react';
-require('styles/button.scss');
+import StepsView from 'components/StepsView';
+import FrameView from 'components/FrameView';
 require('styles/view.scss');
-var Parser = require('lang/parser');
+
+
 var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 import evaluateASTTree from 'lang/evaluator';
 import Scope from 'lang/scope';
-import StepsView from 'components/StepsView';
-import FrameView from 'components/FrameView';
-import D from 'dataManager';
-import Scope from 'lang/scope';
-import StepActions from 'actions/StepActions';
-import StepStore from 'stores/StepStore';
+var Parser = require('lang/parser');
 
 export default React.createClass({
     displayName: 'BaseView'
   , getInitialState: function() {
-    return {steps: []};
+    return { selectedStep: null
+           , steps: []
+           };
     // return { selectedStepIndex: (D.getStepCount(this.props.firstStep) - 1)
     //        , lastStep: this.props.lastStep
     //        , firstStep: this.props.firstStep};
@@ -36,9 +41,17 @@ export default React.createClass({
   , changeSelection: function (newStepIndex) {
     this.setState({selectedStepIndex: newStepIndex});
   }
+  // , addNewStep: function(){
+  //   var newStep = D.createNewFrameAfterStep(this.state.lastStep);
+  //   this.setState({lastStep: newStep});
+  // }
   , addNewStep: function(){
-    var newStep = D.createNewFrameAfterStep(this.state.lastStep);
-    this.setState({lastStep: newStep});
+    var id = null;
+    var stepCount = this.state.steps.length;
+    if (stepCount > 0) {
+      id = this.state.steps[stepCount-1].id;
+    }
+    StepActions.addStep(id);
   }
   , handleFrameCodeChange: function (frame, newCodeValue) {
     D.setTransformationCodeForStep(frame, newCodeValue);
@@ -72,7 +85,7 @@ export default React.createClass({
       return steps;
   }
   , render: function() {
-    return <span style={{color: 'red'}} onClick={StepActions.addStep}>{JSON.stringify(this.state.steps)}</span>
+    return <span style={{color: 'red'}} onClick={this.addNewStep}>{JSON.stringify(this.state.steps)}</span>
     // var fakeSteps = this.getSteps();
     // return <div className='wrapper'>
     //         <StepsView steps={fakeSteps}
