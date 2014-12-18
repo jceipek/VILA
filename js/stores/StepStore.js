@@ -2,13 +2,16 @@
 var Reflux = require('reflux');
 import StepActions from 'actions/StepActions';
 import Scope from 'lang/scope';
+import evaluateASTTree from 'lang/evaluator';
+var Parser = require('lang/parser');
+var M = require("mori"); // Couldn't figure out how to convert to ECMAScript6
 
 
 // TODO: Think about a different way to construct ids?
 var _nextId = 0;
 var _getNewId = function () {
   return (_nextId++); // Add after returning old value
-}
+};
 
 var _makeFrame = function (inputScope, codeStr) {
   return {
@@ -21,6 +24,11 @@ var _makeFrame = function (inputScope, codeStr) {
 
 var _steps = [_makeFrame(Scope.makeScope(),"1+2")];
 
+window.getSteps = function () {
+  return _steps.map((s) => {return M.clj_to_js(s.inputScope)});
+}
+
+
 var _findFrameIndex = function (id) {
   for (var i = 0; i < _steps.length; i++) {
     if (_steps[i].id === id) {
@@ -28,7 +36,21 @@ var _findFrameIndex = function (id) {
     }
   }
   throw new Error("CAN'T FIND FRAME WITH INDEX: "+id);
-}
+};
+
+var _outputScopeFromFrame = function (frame) {
+  var newScope = frame.inputScope;
+  try {
+    var parse = Parser.parse(frame.code);
+    var result = evaluateASTTree(parse, frame.inputScope);
+    if (result.status === 'ASSIGNMENT') {
+      newScope = Scope.mapSymbolToValue(frame.inputScope, frame, M.get(result.symbol, 'name'), result.value);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+  return newScope;
+};
 
 export default Reflux.createStore({
   listenables: StepActions
@@ -38,11 +60,10 @@ export default Reflux.createStore({
       _steps.push(_makeFrame(Scope.makeScope(),""));
     } else {
       var lastIndex = _findFrameIndex(lastId);
-      // Need to get output scope
-      var outputScope = _steps[lastIndex];
+      var outputScope = _outputScopeFromFrame(_steps[lastIndex])
       _steps.splice(lastIndex+1
                    , 0 // Remove 0 items.
-                   , _makeFrame(Scope.makeScope({lastScope: outputScope}),""));
+                   , _makeFrame(outputScope,""));
     }
     this.updateSteps(_steps);
   }
@@ -50,6 +71,10 @@ export default Reflux.createStore({
     console.log('UPDATE STEP FIRED');
     var index = _findFrameIndex(id);
     _steps[index].code = code;
+    while (index+1 < _steps.length) {
+      _steps[index+1].inputScope = _outputScopeFromFrame(_steps[index]);
+      index++;
+    }
     this.updateSteps(_steps);
   }
 , onRemoveStep: function () {
